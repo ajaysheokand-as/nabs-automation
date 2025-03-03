@@ -1,11 +1,8 @@
-import { MainLayout } from "./layouts/MainLayout";
-
+import { Dashboard } from "./pages/Dashboard";
 function App() {
   return (
     <>
-    <MainLayout>
-      <h1>Home Screen</h1>
-    </MainLayout>
+    <Dashboard/>
     </>
   );
 }
