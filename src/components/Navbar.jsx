@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FaHome, FaInfoCircle, FaServicestack, FaEnvelope, FaBars, FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -7,31 +8,31 @@ export const Navbar = () => {
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo */}
-        <a href="#" className="text-2xl font-bold text-blue-600">
+        <Link to="/" className="text-2xl font-bold text-blue-600">
           NABS Automation
-        </a>
+        </Link>
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex space-x-6">
           <li>
-            <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+            <Link to={"/"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
               <FaHome /> <span>Home</span>
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+            <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
               <FaInfoCircle /> <span>About</span>
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+            <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
               <FaServicestack /> <span>Services</span>
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+            <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
               <FaEnvelope /> <span>Contact</span>
-            </a>
+            </Link>
           </li>
         </ul>
 
@@ -49,24 +50,24 @@ export const Navbar = () => {
         <div className="md:hidden bg-white shadow-md">
           <ul className="flex flex-col space-y-4 p-4">
             <li>
-              <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+              <Link to="/" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
                 <FaHome /> <span>Home</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+              <Link to="/coming-soon" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
                 <FaInfoCircle /> <span>About</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+              <Link href="/coming-soon" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
                 <FaServicestack /> <span>Services</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+              <Link href="/coming-soon" className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
                 <FaEnvelope /> <span>Contact</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

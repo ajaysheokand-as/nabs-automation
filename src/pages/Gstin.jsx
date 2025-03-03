@@ -45,22 +45,21 @@ export const Gstin = () => {
                     <InfoCard title="Over Due" count="0" icon={<FaFileAlt />} />
                 </div>
                     <NoticeSummery />
-                    
                 </div>
                 
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition">
+                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition cursor-pointer">
                         Add Company
                     </button>
-                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition">
+                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition cursor-pointer">
                         Import Company
                     </button>
-                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition">
+                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition cursor-pointer">
                         Download Template
                     </button>
-                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition">
+                    <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition cursor-pointer">
                         Sync All
                     </button>
                 </div>
