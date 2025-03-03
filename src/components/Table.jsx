@@ -1,0 +1,68 @@
+import React, { useState } from 'react'
+
+export const Table = ({ columns, data, itemsPerPage = 5 }) => {
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+  
+    const paginatedData = data.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+  return (
+    <div className="w-full overflow-x-auto bg-white shadow-md rounded-lg p-4">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-200 text-left">
+            {columns.map((col, index) => (
+              <th key={index} className="p-3 border-b">{col.label}</th>
+            ))}
+            <th className="p-3 border-b">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {paginatedData.length > 0 ? (
+            paginatedData.map((row, rowIndex) => (
+              <tr key={rowIndex} className="border-b hover:bg-gray-100">
+                {columns.map((col, colIndex) => (
+                  <td key={colIndex} className="p-3">{row[col.key]}</td>
+                ))}
+                <td className="p-3 flex gap-2">
+                  <button className="px-2 py-1 bg-blue-500 text-white rounded">Edit</button>
+                  <button className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                  <button className="px-2 py-1 bg-green-500 text-white rounded">View</button>
+                  <button className="px-2 py-1 bg-blue-500 text-white rounded">Sync</button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={columns.length + 1} className="p-3 text-center text-gray-500">
+                No data available
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <button
+          className={`px-4 py-2 bg-gray-300 rounded ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-400"}`}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className={`px-4 py-2 bg-gray-300 rounded ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-400"}`}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}
