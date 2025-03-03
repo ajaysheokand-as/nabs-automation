@@ -20,18 +20,23 @@ export const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaInfoCircle /> <span>About</span>
+            <Link to={"/"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+              <FaInfoCircle /> <span>Dashboard</span>
+            </Link>
+          </li>
+          <li>
+            <Link to={"/notice"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+              <FaServicestack /> <span>Notice</span>
             </Link>
           </li>
           <li>
             <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaServicestack /> <span>Services</span>
+              <FaEnvelope /> <span>Submission</span>
             </Link>
           </li>
           <li>
             <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaEnvelope /> <span>Contact</span>
+              <FaEnvelope /> <span>Report</span>
             </Link>
           </li>
         </ul>
