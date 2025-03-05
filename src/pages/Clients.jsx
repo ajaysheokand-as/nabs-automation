@@ -76,7 +76,7 @@ export const Clients = ({ serviceType }) => {
         columns={columns}
         data={clientsData}
         itemsPerPage={10}
-        rowRedirection={"/client-view"}
+        rowRedirection={"/gstin/client-view/2112"}
       />
     </>
   );

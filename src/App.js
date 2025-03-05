@@ -15,6 +15,7 @@ import { TDSLayout } from "./layouts/TDSLayout";
 import { MainLayout } from "./layouts/MainLayout";
 import Error404 from "./pages/Error404";
 import { ServiceType } from "./utils/enums";
+import { GSTNoticeDetails } from "./pages/gst/GSTNoticeDetails";
 
 function App() {
   return (
@@ -28,8 +29,12 @@ function App() {
         <Route path={`/${ServiceType.GSTIN}`} element={<GSTLayout />}>
           <Route index element={<Gstin serviceType={ServiceType.GSTIN} />} />
           <Route
-            path="notice"
+            path="notices"
             element={<Notice serviceType={ServiceType.GSTIN} />}
+          />
+          <Route
+            path="notices/:noticeId"
+            element={<GSTNoticeDetails serviceType={ServiceType.GSTIN} />}
           />
           <Route
             path="clients"

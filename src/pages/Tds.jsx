@@ -1,11 +1,12 @@
 import React from "react";
 import { InfoCard } from "../components/InfoCard";
-import { NoticeSummery } from "../components/NoticeSummery";
 import { Calender } from "../components/Calender";
 import { Table } from "../components/Table";
 import { FaRegCalendar, FaRegClock, FaFileAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export const Tds = () => {
+  const navigate = useNavigate();
   const data = [
     { title: "Company 1", count: 0, icon: <FaFileAlt /> },
     { title: "Company 2", count: 0, icon: <FaRegCalendar /> },
@@ -36,7 +37,12 @@ export const Tds = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          <InfoCard title="Total Notices" count="0" icon={<FaFileAlt />} />
+          <InfoCard
+            title="Total Notices"
+            count="0"
+            icon={<FaFileAlt />}
+            onClick={() => navigate("notice")}
+          />
           <InfoCard title="Last 15 Days" count="0" icon={<FaRegCalendar />} />
           <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
           <InfoCard title="Total GSTIN" count="0" icon={<FaFileAlt />} />

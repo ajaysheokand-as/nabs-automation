@@ -7,6 +7,7 @@ export const Table = ({
   itemsPerPage = 5,
   rowRedirection,
   isPagination = 1,
+  isLoading = false,
 }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,13 +36,27 @@ export const Table = ({
               <tr
                 key={rowIndex}
                 className="border-b hover:bg-gray-100"
-                onClick={() => rowRedirection && navigate(`${rowRedirection}`)}
+                onClick={() => {
+                  if (rowRedirection && typeof rowRedirection === "function") {
+                    navigate(rowRedirection(row));
+                  } else if (
+                    rowRedirection &&
+                    typeof rowRedirection === "string"
+                  ) {
+                    navigate(rowRedirection);
+                  }
+                }}
               >
-                {columns.map((col, colIndex) => (
-                  <td key={colIndex} className="p-3 cursor-pointer">
-                    {row[col.key]}
-                  </td>
-                ))}
+                {columns.map((col, colIndex) => {
+                  if (col.render) {
+                    return <>{col.render(row)}</>;
+                  }
+                  return (
+                    <td key={colIndex} className="p-3 cursor-pointer">
+                      {row[col.key]}
+                    </td>
+                  );
+                })}
                 {/* <td className="p-3 flex gap-2">
                   <button className="px-2 py-1 bg-blue-500 text-white rounded cursor-pointer">Edit</button>
                   <button className="px-2 py-1 bg-red-400 text-white rounded cursor-pointer">Delete</button>
@@ -51,14 +66,27 @@ export const Table = ({
               </tr>
             ))
           ) : (
-            <tr>
-              <td
-                colSpan={columns.length + 1}
-                className="p-3 text-center text-gray-500"
-              >
-                Loading ...
-              </td>
-            </tr>
+            <>
+              {!isLoading && paginatedData.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={columns.length + 1}
+                    className="p-3 text-center text-gray-500"
+                  >
+                    No Data Available
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td
+                    colSpan={columns.length + 1}
+                    className="p-3 text-center text-gray-500"
+                  >
+                    Loading ...
+                  </td>
+                </tr>
+              )}
+            </>
           )}
         </tbody>
       </table>

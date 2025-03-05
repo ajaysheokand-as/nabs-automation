@@ -1,27 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { InfoCard } from "../components/InfoCard";
 import { NoticeSummery } from "../components/NoticeSummery";
 import { Calender } from "../components/Calender";
 import { FaRegCalendar, FaRegClock, FaFileAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAxiosPost } from "../hooks/useAxios";
+import { CardTypes } from "../utils/enums";
+
+const Cards = [
+  {
+    id: CardTypes.TOTAL_NOTICES,
+    title: "Total Notices",
+    path: "notices",
+    icon: FaFileAlt,
+  },
+  {
+    id: CardTypes.LAST_15_DAYS,
+    title: "Last 15 Days",
+    icon: FaRegCalendar,
+  },
+  {
+    id: CardTypes.LAST_24_HOURS,
+    title: "Last 24 Hours",
+    icon: FaRegClock,
+  },
+  {
+    id: CardTypes.TOTAL_CLIENTS,
+    title: "Total Clients",
+    path: "clients",
+    icon: FaFileAlt,
+  },
+  {
+    id: CardTypes.OPEN_NOTICES,
+    title: "Open Notices",
+    icon: FaFileAlt,
+  },
+  {
+    id: CardTypes.OVER_DUE,
+    title: "Over Due",
+    icon: FaFileAlt,
+  },
+];
 
 export const Gstin = () => {
   const navigate = useNavigate();
+  const [cardsData, setCardsData] = useState({});
+  const [fetchGSTCards] = useAxiosPost("fin_buddy.api.get_gst_cards");
 
-  const data = [
-    { title: "Company 1", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 2", count: 0, icon: <FaRegCalendar /> },
-    { title: "Company 3", count: 0, icon: <FaRegClock /> },
-    { title: "Company 4", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 5", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 6", count: 0, icon: <FaFileAlt /> },
-  ];
-
-  const columns = [
-    { label: "Title", key: "title" },
-    { label: "Count", key: "count" },
-    { label: "Icon", key: "icon" },
-  ];
+  useEffect(() => {
+    fetchGSTCards({
+      cb: (data) => {
+        setCardsData(data?.result || {});
+      },
+    });
+  }, []);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -36,20 +68,23 @@ export const Gstin = () => {
           <option value="due">Due Notices</option>
         </select>
       </div>
+
+      {/* Cards Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          <InfoCard
-            title="Total Notices"
-            count="0"
-            icon={<FaFileAlt />}
-            onClick={() => navigate("notice")}
-          />
-          <InfoCard title="Last 15 Days" count="0" icon={<FaRegCalendar />} />
-          <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
-          <InfoCard title="Total GSTIN" count="0" icon={<FaFileAlt />} />
-          <InfoCard title="Open Notices" count="0" icon={<FaFileAlt />} />
-          <InfoCard title="Over Due" count="0" icon={<FaFileAlt />} />
+          {Cards.map((card, index) => (
+            <InfoCard
+              key={index}
+              title={card.title}
+              count={cardsData[card.id] || 0}
+              icon={<card.icon />}
+              onClick={() => {
+                if (card.path) {
+                  navigate(card.path);
+                }
+              }}
+            />
+          ))}
         </div>
         <NoticeSummery />
       </div>
