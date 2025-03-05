@@ -5,6 +5,9 @@ import { IncomeTax } from "./pages/IncomeTax";
 import { Tds } from "./pages/Tds";
 import { ComingSoon } from "./components/ComingSoon";
 import { Notice } from "./pages/Notice";
+import { Clients } from "./pages/Clients";
+import { ClientView } from "./pages/ClientView";
+import { Eproceedings } from "./pages/incometax/Eproceedings";
 
 function App() {
   return (
@@ -15,6 +18,10 @@ function App() {
         <Route path="/income-tax" element={<IncomeTax/>} />
         <Route path="/tds" element={<Tds/>} />
         <Route path="/notice" element={<Notice/>} />
+        <Route path="/clients" element={<Clients/>} />
+        <Route path="/client-view" element={<ClientView/>} />
+        <Route path="/eproceedings" element={<Eproceedings/>} />
+        
         <Route path="/coming-soon" element={<ComingSoon/>} />
 
         <Route path="*" element={<h1 className="text-center mt-10 text-red-500">404 Page Not Found</h1>} />

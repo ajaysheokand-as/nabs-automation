@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaHome, FaInfoCircle, FaServicestack, FaEnvelope, FaBars, FaTimes } from "react-icons/fa";
+import { FaHome, FaInfoCircle, FaServicestack, FaEnvelope, FaBars, FaTimes, FaUsers, FaClipboardList } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
@@ -19,24 +19,24 @@ export const Navbar = () => {
               <FaHome /> <span>Home</span>
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to={"/"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaInfoCircle /> <span>Dashboard</span>
+              <FaInfoCircle /> <span>E-Proceeding</span>
             </Link>
           </li>
           <li>
             <Link to={"/notice"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaServicestack /> <span>Notice</span>
+              <FaServicestack /> <span>Outstanding Demands</span>
+            </Link>
+          </li> */}
+          <li>
+            <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
+            <FaUsers /> <span>All Users</span>
             </Link>
           </li>
           <li>
             <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaEnvelope /> <span>Submission</span>
-            </Link>
-          </li>
-          <li>
-            <Link to={"/coming-soon"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
-              <FaEnvelope /> <span>Report</span>
+            <FaClipboardList /> <span>Reports</span>
             </Link>
           </li>
         </ul>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { useNavigate } from "react-router-dom";
 
-export const Table = ({ columns, data, itemsPerPage = 5 }) => {
+export const Table = ({ columns, data, itemsPerPage = 5, rowRedirection }) => {
+      const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = Math.ceil(data.length / itemsPerPage);
   
@@ -16,22 +18,22 @@ export const Table = ({ columns, data, itemsPerPage = 5 }) => {
             {columns.map((col, index) => (
               <th key={index} className="p-3 border-b">{col.label}</th>
             ))}
-            <th className="p-3 border-b">Actions</th>
+            {/* <th className="p-3 border-b">Actions</th> */}
           </tr>
         </thead>
         <tbody>
           {paginatedData.length > 0 ? (
             paginatedData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="border-b hover:bg-gray-100">
+              <tr key={rowIndex} className="border-b hover:bg-gray-100" onClick={()=> rowRedirection && navigate(`${rowRedirection}`)}>
                 {columns.map((col, colIndex) => (
-                  <td key={colIndex} className="p-3">{row[col.key]}</td>
+                  <td key={colIndex} className="p-3 cursor-pointer">{row[col.key]}</td>
                 ))}
-                <td className="p-3 flex gap-2">
+                {/* <td className="p-3 flex gap-2">
                   <button className="px-2 py-1 bg-blue-500 text-white rounded cursor-pointer">Edit</button>
-                  <button className="px-2 py-1 bg-red-500 text-white rounded cursor-pointer">Delete</button>
+                  <button className="px-2 py-1 bg-red-400 text-white rounded cursor-pointer">Delete</button>
                   <button className="px-2 py-1 bg-green-500 text-white rounded cursor-pointer">View</button>
                   <button className="px-2 py-1 bg-blue-500 text-white rounded cursor-pointer">Sync</button>
-                </td>
+                </td> */}
               </tr>
             ))
           ) : (

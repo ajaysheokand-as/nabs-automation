@@ -5,8 +5,11 @@ import { NoticeSummery } from '../components/NoticeSummery';
 import { Calender } from '../components/Calender';
 import { Table } from '../components/Table';
 import { FaRegCalendar, FaRegClock, FaSyncAlt, FaFileAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export const Gstin = () => {
+        const navigate = useNavigate();
+    
     const data = [
         { title: "Company 1", count: 0, icon: <FaFileAlt /> },
         { title: "Company 2", count: 0, icon: <FaRegCalendar /> },
@@ -37,7 +40,7 @@ export const Gstin = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Cards Section */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <InfoCard title="Total Notices" count="0" icon={<FaFileAlt />} />
+                    <InfoCard title="Total Notices" count="0" icon={<FaFileAlt />} onClick={()=>navigate("/notice")} />
                     <InfoCard title="Last 15 Days" count="0" icon={<FaRegCalendar />} />
                     <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
                     <InfoCard title="Total GSTIN" count="0" icon={<FaFileAlt />} />
@@ -66,7 +69,7 @@ export const Gstin = () => {
 
                 {/* Notice Summary Table & Calendar */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Table columns={columns} data={data} itemsPerPage={3} />
+                    {/* <Table columns={columns} data={data} itemsPerPage={3} /> */}
                     <Calender />
                 </div>
             </div>
