@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "../components/Card";
 import { MainLayout } from "../layouts/MainLayout";
-import GSTIN from "../assets/images/GSTIN.jpeg";
+import GSTIN from "../assets/images/GSTnew.jpg";
 import INCOMETAX from "../assets/images/INCOMETAX.jpeg";
 import TDS from "../assets/images/TDS.jpeg";
 import { useNavigate } from "react-router-dom";
