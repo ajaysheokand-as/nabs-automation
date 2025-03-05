@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react'
-import { Table } from "../components/Table";
-import { postData } from "../api/apiService";
-import PageTitle from "../components/PageTitle";
-
-export const Notice = () => {
-  const [notices, setNotices] = useState([]);
-  const getNotices = async () => {
+import React, { useEffect, useState } from "react";
+import { Table } from "../../components/Table";
+import PageTitle from "../../components/PageTitle";
+import { columns, data } from "../../utils/constants";
+import { postData } from "../../api/apiService";
+export const Eproceedings = () => {
+  const [ePdataList, setEPDataList] = useState([]);
+  const eProceedingsList = async () => {
     const data = await postData("fin_buddy.api.e_proceeding_list", {
       start: 0,
       page_length: 20,
       search_query: "", //search_query can handle global seach, you can search with proceeding_name, client, notice_din and id. also there is search support for creation date use this format for date search : 'YYYY-MM-DD to YYYY-MM-DD'.
     });
-    setNotices(data?.result?.records);
+    setEPDataList(data?.result?.records);
     console.log("data=>", data);
   };
 
   useEffect(() => {
-    getNotices();
+    eProceedingsList();
   }, []);
 
   const columns = [
@@ -30,10 +30,10 @@ export const Notice = () => {
 
   return (
     <>
-      <PageTitle title="Notices" />
+      <PageTitle title="E-Proceedings" />
       <Table
         columns={columns}
-        data={notices}
+        data={ePdataList}
         itemsPerPage={10}
         rowRedirection={"/eproceeding-details"}
       />

@@ -31,6 +31,14 @@ export const Navbar = () => {
               <FaHome /> <span>Home</span>
             </Link>
           </li>
+          <li>
+            <Link
+              to={"/"}
+              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300"
+            >
+              <FaHome /> <span>Test</span>
+            </Link>
+          </li>
           {/* <li>
             <Link to={"/"} className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300">
               <FaInfoCircle /> <span>E-Proceeding</span>

@@ -7,8 +7,7 @@ const Card = ({ image, title, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white shadow-lg rounded-lg overflow-hidden max-w-sm w-full cursor-pointer 
-                 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
+      className="bg-white shadow-lg rounded-lg overflow-hidden max-w-sm w-full cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
     >
       {/* Card Image (Only Show If Available) */}
       {image && (

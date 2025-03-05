@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
 export const InfoCard = ({ title, count, icon, onClick }) => {
   return (
-    <div 
+    <div
       className="bg-white shadow-md rounded-lg p-4 flex items-center space-x-4 hover:shadow-lg transition cursor-pointer"
       onClick={onClick}
     >
