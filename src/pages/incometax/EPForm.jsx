@@ -21,6 +21,8 @@ export const EPForm = () => {
         status: '',
         remarks: '',
         file: null,
+        response:"",
+        userInput:""
     });
 
     const handleChange = (e) => {
@@ -94,14 +96,6 @@ export const EPForm = () => {
                                 <label className="block text-gray-700 font-medium">Document reference ID</label>
                                 <input type="text" name="department" value={formData.department} onChange={handleChange} className="w-full p-2 border rounded-md" />
                             </div>
-                            {/* <div>
-                                <label className="block text-gray-700 font-medium">Status</label>
-                                <input type="text" name="status" value={formData.status} onChange={handleChange} className="w-full p-2 border rounded-md" />
-                            </div>
-                            <div>
-                                <label className="block text-gray-700 font-medium">Remarks</label>
-                                <input type="text" name="remarks" value={formData.remarks} onChange={handleChange} className="w-full p-2 border rounded-md" />
-                            </div> */}
                         </div>
                     </div>
                     <div className="mb-6 border-b border-gray-300 pb-6">
@@ -153,8 +147,8 @@ export const EPForm = () => {
                         <div>
                             {/* <label className="block text-gray-700 font-medium">User Input</label> */}
                             <textarea
-                                name="department"
-                                value={formData.department}
+                                name="userInput"
+                                value={formData.userInput}
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded-md"
                                 rows={4} // Adjust rows as needed
@@ -183,6 +177,30 @@ export const EPForm = () => {
                                 </label>
                             ))}
                         </div>
+                        <label className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        name="maskData"
+                                        value="1"
+                                        className="rounded"
+                                        // checked = {1}
+                                    />
+                                    <span>Send your data to AI Model for response generation?</span>
+                                </label>
+                    </div>
+                    <div className="mb-6 border-b border-gray-300 pb-6">
+                        <h3 className="text-lg font-semibold text-gray-800 mb-2">Response Message</h3>
+                        <div>
+                            {/* <label className="block text-gray-700 font-medium">User Input</label> */}
+                            <textarea
+                                name="response"
+                                value={formData.response}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded-md"
+                                rows={4} // Adjust rows as needed
+                            />
+                        </div>
+
                     </div>
                     <div className="mt-6 flex justify-end">
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Submit</button>
