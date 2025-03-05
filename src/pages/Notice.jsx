@@ -36,7 +36,7 @@ export const Notice = () => {
   return (
     <MainLayout>
       <Header title="Notices" navigate={() => navigate(-1)} />
-      <Table columns={columns} data={notices} itemsPerPage={10} />
+      <Table columns={columns} data={notices} itemsPerPage={10} rowRedirection={"/eproceeding-details"}/>
     </MainLayout>
   )
 }

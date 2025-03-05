@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from "react-router-dom";
 
-export const Table = ({ columns, data, itemsPerPage = 5, rowRedirection }) => {
+export const Table = ({ columns, data, itemsPerPage = 5, rowRedirection, isPagination = 1 }) => {
       const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -22,7 +22,7 @@ export const Table = ({ columns, data, itemsPerPage = 5, rowRedirection }) => {
           </tr>
         </thead>
         <tbody>
-          {paginatedData.length > 0 ? (
+          { paginatedData.length > 0 ? (
             paginatedData.map((row, rowIndex) => (
               <tr key={rowIndex} className="border-b hover:bg-gray-100" onClick={()=> rowRedirection && navigate(`${rowRedirection}`)}>
                 {columns.map((col, colIndex) => (
@@ -39,14 +39,15 @@ export const Table = ({ columns, data, itemsPerPage = 5, rowRedirection }) => {
           ) : (
             <tr>
               <td colSpan={columns.length + 1} className="p-3 text-center text-gray-500">
-                No data available
+                Loading ...
               </td>
             </tr>
           )}
         </tbody>
       </table>
       {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-4">
+      {isPagination ?
+       <div className="flex justify-between items-center mt-4">
         <button
           className={`px-4 py-2 bg-gray-300 rounded cursor-pointer ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-400"}`}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -64,7 +65,7 @@ export const Table = ({ columns, data, itemsPerPage = 5, rowRedirection }) => {
         >
           Next
         </button>
-      </div>
+      </div> : " "}
     </div>
   )
 }

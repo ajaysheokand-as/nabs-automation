@@ -8,6 +8,7 @@ import { Notice } from "./pages/Notice";
 import { Clients } from "./pages/Clients";
 import { ClientView } from "./pages/ClientView";
 import { Eproceedings } from "./pages/incometax/Eproceedings";
+import { EPForm } from "./pages/incometax/EPForm";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/clients" element={<Clients/>} />
         <Route path="/client-view" element={<ClientView/>} />
         <Route path="/eproceedings" element={<Eproceedings/>} />
+        <Route path="/eproceeding-details" element={<EPForm/>} />
         
         <Route path="/coming-soon" element={<ComingSoon/>} />
 
