@@ -57,7 +57,7 @@ export const IncomeTax = () => {
           <InfoCard
             title="Total Clients"
             count="3"
-            onClick={() => navigate("/clients")}
+            onClick={() => navigate("clients")}
             icon={<FaIdCard />}
           />
           <InfoCard

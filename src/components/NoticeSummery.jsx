@@ -6,7 +6,7 @@ export const NoticeSummery = () => {
       <h2 className="text-lg font-semibold mb-4">Notice Summary</h2>
       <table className="w-full border-collapse">
         <thead>
-          <tr className="bg-blue-600 text-white">
+          <tr className="bg-blue-900 text-white">
             <th className="p-2">Remarks</th>
             <th className="p-2">Total</th>
             <th className="p-2">Open</th>

@@ -1,5 +1,7 @@
 import React from "react";
+import { MainLayout } from "../layouts/MainLayout";
 import { InfoCard } from "../components/InfoCard";
+import { NoticeSummery } from "../components/NoticeSummery";
 import { Calender } from "../components/Calender";
 import { Table } from "../components/Table";
 import { FaRegCalendar, FaRegClock, FaFileAlt } from "react-icons/fa";
