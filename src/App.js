@@ -49,7 +49,7 @@ function App() {
             element={<ClientView serviceType={ServiceType.GSTIN} />}
           />
           <Route
-            path="eproceedings"
+            path="eproceedings/:clientId"
             element={<Eproceedings serviceType={ServiceType.GSTIN} />}
           />
           <Route
@@ -79,7 +79,7 @@ function App() {
             element={<ClientView serviceType={ServiceType.INCOME_TAX} />}
           />
           <Route
-            path="eproceedings"
+            path="eproceedings/:clientId"
             element={<Eproceedings serviceType={ServiceType.INCOME_TAX} />}
           />
           <Route
@@ -103,7 +103,7 @@ function App() {
             element={<ClientView serviceType={ServiceType.TDS} />}
           />
           <Route
-            path="eproceedings"
+            path="eproceedings/:clientId"
             element={<Eproceedings serviceType={ServiceType.TDS} />}
           />
           <Route
