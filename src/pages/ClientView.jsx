@@ -54,7 +54,9 @@ export const ClientView = ({ serviceType }) => {
               Response to Outstanding Demand
             </button>
             <button
-              onClick={() => navigate(`/${serviceType}/eproceedings`)}
+              onClick={() =>
+                navigate(`/${serviceType}/eproceedings/${clientId}`)
+              }
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               E Proceeding{" "}
