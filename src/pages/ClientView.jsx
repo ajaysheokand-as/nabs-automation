@@ -16,6 +16,7 @@ export const ClientView = ({ serviceType }) => {
   const navigate = useNavigate();
   const { clientId } = useParams();
 
+  console.log("CLIENT IDD", clientId);
   const [formData, setFormData] = useState({});
 
   const [fetchClientDetails] = useAxiosPost(
@@ -53,7 +54,7 @@ export const ClientView = ({ serviceType }) => {
               Response to Outstanding Demand
             </button>
             <button
-              onClick={() => navigate("/eproceedings")}
+              onClick={() => navigate(`/${serviceType}/eproceedings`)}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               E Proceeding{" "}

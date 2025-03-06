@@ -57,9 +57,6 @@ export const Clients = ({ serviceType }) => {
       case ServiceType.GSTIN:
         return `${row?.id}`;
 
-      case ServiceType.INCOME_TAX:
-        return `${row?.id}`;
-
       case ServiceType.TDS:
         return `${row?.id}`;
 
@@ -90,6 +87,7 @@ export const Clients = ({ serviceType }) => {
         columns={columns}
         data={clientsData}
         type="clients"
+        serviceType={serviceType}
         itemsPerPage={10}
         rowRedirection={handleRowRedirection}
       />

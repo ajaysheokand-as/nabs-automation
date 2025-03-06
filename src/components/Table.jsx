@@ -9,6 +9,7 @@ export const Table = ({
   itemsPerPage = 5,
   rowRedirection,
   isPagination = 1,
+  serviceType = null,
   isLoading = false,
   type = null,
 }) => {
@@ -28,7 +29,11 @@ export const Table = ({
     }
 
     if (rowRedirection && typeof rowRedirection === "function") {
-      navigate(rowRedirection(data));
+      if (serviceType == "income-tax" && type == "clients") {
+        navigate(`/${serviceType}/client-view/${data.id}`);
+      } else {
+        navigate(rowRedirection(data));
+      }
     } else if (rowRedirection && typeof rowRedirection === "string") {
       if (type == "eproceeding") {
         navigate(`${rowRedirection}?proccedingID=${data?.id}`);

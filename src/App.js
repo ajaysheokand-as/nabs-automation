@@ -75,7 +75,7 @@ function App() {
             element={<Clients serviceType={ServiceType.INCOME_TAX} />}
           />
           <Route
-            path="client-view/:cliendId"
+            path="client-view/:clientId"
             element={<ClientView serviceType={ServiceType.INCOME_TAX} />}
           />
           <Route
