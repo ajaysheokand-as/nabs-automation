@@ -52,6 +52,22 @@ export const Clients = ({ serviceType }) => {
     });
   }, []);
 
+  const handleRowRedirection = (row) => {
+    switch (serviceType) {
+      case ServiceType.GSTIN:
+        return `${row?.id}`;
+
+      case ServiceType.INCOME_TAX:
+        return `${row?.id}`;
+
+      case ServiceType.TDS:
+        return `${row?.id}`;
+
+      default:
+        return "/404";
+    }
+  };
+
   return (
     <>
       <PageTitle title="All Clients" navigate={() => navigate(-1)} />
@@ -74,7 +90,7 @@ export const Clients = ({ serviceType }) => {
         columns={columns}
         data={clientsData}
         itemsPerPage={10}
-        rowRedirection={"/gstin/client-view/2112"}
+        rowRedirection={handleRowRedirection}
       />
     </>
   );

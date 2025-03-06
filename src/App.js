@@ -45,6 +45,10 @@ function App() {
             element={<ClientView serviceType={ServiceType.GSTIN} />}
           />
           <Route
+            path="clients/:clientId"
+            element={<ClientView serviceType={ServiceType.GSTIN} />}
+          />
+          <Route
             path="eproceedings"
             element={<Eproceedings serviceType={ServiceType.GSTIN} />}
           />

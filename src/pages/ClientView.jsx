@@ -1,19 +1,26 @@
-import React, {useState} from 'react'
+import React, { useState, useEffect } from "react";
 import PageTitle from "../components/PageTitle";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAxiosPost } from "../hooks/useAxios";
+import { ServiceType } from "../utils/enums";
 
-export const ClientView = () => {
+const urlMapping = {
+  fetchClients: {
+    [ServiceType.GSTIN]: "fin_buddy.api.gst_client_details",
+    [ServiceType.INCOME_TAX]: "fin_buddy.api.income_tax_client_details",
+    [ServiceType.TDS]: "fin_buddy.api.tds_client_details",
+  },
+};
+
+export const ClientView = ({ serviceType }) => {
   const navigate = useNavigate();
+  const { clientId } = useParams();
 
-  const [formData, setFormData] = useState({
-    clientName: "HRC Infra Pvt Ltd",
-    dob: "",
-    disabled: false,
-    username: "AADCH3199K",
-    password: "********",
-    lastSync: "03-03-2025 11:37:18",
-    timezone: "Asia/Kolkata",
-  });
+  const [formData, setFormData] = useState({});
+
+  const [fetchClientDetails] = useAxiosPost(
+    urlMapping.fetchClients[serviceType]
+  );
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,25 +29,53 @@ export const ClientView = () => {
       [name]: type === "checkbox" ? checked : value,
     });
   };
+
+  useEffect(() => {
+    fetchClientDetails({
+      payload: {
+        id: clientId,
+      },
+      cb: (data) => {
+        console.log(data);
+        setFormData(data?.result || {});
+      },
+    });
+  }, []);
+
   return (
     <>
       <PageTitle title="Client Details" />
       <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-8">
         {/* Buttons */}
-        <div className="flex justify-between mb-6">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer">
-            Response to Outstanding Demand
-          </button>
-          <button
-            onClick={() => navigate("/eproceedings")}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
-          >
-            E Proceeding{" "}
-            <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded ml-2">
-              2
-            </span>
-          </button>
-        </div>
+        {serviceType === ServiceType.INCOME_TAX && (
+          <div className="flex justify-between mb-6">
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer">
+              Response to Outstanding Demand
+            </button>
+            <button
+              onClick={() => navigate("/eproceedings")}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            >
+              E Proceeding{" "}
+              <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded ml-2">
+                2
+              </span>
+            </button>
+          </div>
+        )}
+
+        {serviceType === ServiceType.GSTIN && (
+          <div className="flex justify-end mb-6">
+            <button
+              onClick={() =>
+                navigate(`/${serviceType}/notices?clientId=${clientId}`)
+              }
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            >
+              GST Notice
+            </button>
+          </div>
+        )}
 
         {/* Client Details */}
         <div className="border-b pb-4 mb-4">
@@ -55,7 +90,7 @@ export const ClientView = () => {
               <input
                 type="text"
                 name="clientName"
-                value={formData.clientName}
+                value={formData.client_name}
                 disabled
                 className="w-full p-2 border rounded bg-gray-100 text-gray-800"
               />
@@ -97,7 +132,7 @@ export const ClientView = () => {
               <input
                 type="text"
                 name="username"
-                value={formData.username}
+                value={formData.gst_username}
                 disabled
                 className="w-full p-2 border rounded bg-gray-100 text-gray-800"
               />
@@ -109,7 +144,7 @@ export const ClientView = () => {
               <input
                 type="password"
                 name="password"
-                value={formData.password}
+                value={formData.gst_password}
                 disabled
                 className="w-full p-2 border rounded bg-gray-100 text-gray-800"
               />
@@ -129,7 +164,7 @@ export const ClientView = () => {
             <input
               type="text"
               name="lastSync"
-              value={formData.lastSync}
+              value={formData.last_gst_sync}
               disabled
               className="w-full p-2 border rounded bg-gray-100 text-gray-800"
             />
