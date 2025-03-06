@@ -35,7 +35,8 @@ export const Eproceedings = () => {
         columns={columns}
         data={ePdataList}
         itemsPerPage={10}
-        rowRedirection={"/eproceeding-details"}
+        type="eproceeding"
+        rowRedirection={"/gstin/eproceeding-details"}
       />
     </>
   );

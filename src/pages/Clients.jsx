@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { Table } from "../components/Table";
 import { useNavigate } from "react-router-dom";
 import PageTitle from "../components/PageTitle";
@@ -75,6 +75,7 @@ export const Clients = ({ serviceType }) => {
       <Table
         columns={columns}
         data={clientsData}
+        type="clients"
         itemsPerPage={10}
         rowRedirection={"/gstin/client-view/2112"}
       />

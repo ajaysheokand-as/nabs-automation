@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AppContext from "../context/AppContext";
+import { FileExclamationOutlined } from "@ant-design/icons";
 
 export const Table = ({
   columns,
@@ -8,15 +10,30 @@ export const Table = ({
   rowRedirection,
   isPagination = 1,
   isLoading = false,
+  type = null,
 }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
+  const { setSelectedEproceeding } = useContext(AppContext);
 
   const paginatedData = data.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleRowClick = (data) => {
+    if (type == "eproceeding") {
+      setSelectedEproceeding(data?.id);
+    }
+
+    if (rowRedirection && typeof rowRedirection === "function") {
+      navigate(rowRedirection(data));
+    } else if (rowRedirection && typeof rowRedirection === "string") {
+      navigate(rowRedirection);
+    }
+  };
+
   return (
     <div className="w-full overflow-x-auto bg-white shadow-md rounded-lg p-4">
       <table className="w-full border-collapse">
@@ -37,14 +54,7 @@ export const Table = ({
                 key={rowIndex}
                 className="border-b hover:bg-gray-100"
                 onClick={() => {
-                  if (rowRedirection && typeof rowRedirection === "function") {
-                    navigate(rowRedirection(row));
-                  } else if (
-                    rowRedirection &&
-                    typeof rowRedirection === "string"
-                  ) {
-                    navigate(rowRedirection);
-                  }
+                  handleRowClick(row);
                 }}
               >
                 {columns.map((col, colIndex) => {
@@ -71,9 +81,12 @@ export const Table = ({
                 <tr>
                   <td
                     colSpan={columns.length + 1}
-                    className="p-3 text-center text-gray-500"
+                    className="pt-4 pb-4 text-center text-gray-500  w-full"
                   >
-                    No Data Available
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <FileExclamationOutlined style={{ fontSize: "30px" }} />
+                      No Data Available
+                    </div>
                   </td>
                 </tr>
               ) : (

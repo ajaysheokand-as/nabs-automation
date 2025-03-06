@@ -3,18 +3,12 @@ import { createContext, useState } from "react";
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  const login = (username) => {
-    setUser({ name: username });
-  };
-
-  const logout = () => {
-    setUser(null);
-  };
+  const [selectedEproceeding, setSelectedEproceeding] = useState(null);
 
   return (
-    <AppContext.Provider value={{ user, login, logout }}>
+    <AppContext.Provider
+      value={{ selectedEproceeding, setSelectedEproceeding }}
+    >
       {children}
     </AppContext.Provider>
   );

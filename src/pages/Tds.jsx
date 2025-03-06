@@ -72,7 +72,7 @@ export const Tds = () => {
 
       {/* Notice Summary Table & Calendar */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Table columns={columns} data={data} itemsPerPage={3} />
+        <Table columns={columns} data={data} type="tds" itemsPerPage={3} />
       </div>
     </div>
   );

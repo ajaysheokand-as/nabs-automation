@@ -245,6 +245,7 @@ export const GSTNoticeDetails = () => {
             <Table
               columns={columns}
               data={data}
+              type="replies"
               itemsPerPage={10}
               isPagination={0}
             />
@@ -271,6 +272,7 @@ export const GSTNoticeDetails = () => {
               <Table
                 columns={columns}
                 data={data}
+                type="documents"
                 itemsPerPage={10}
                 isPagination={0}
               />

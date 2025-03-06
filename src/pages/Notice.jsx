@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { Table } from "../components/Table";
 import { postData } from "../api/apiService";
 import PageTitle from "../components/PageTitle";
@@ -65,6 +65,7 @@ export const Notice = ({ serviceType }) => {
         isLoading={loading}
         columns={columns}
         data={notices}
+        type="notices"
         itemsPerPage={10}
         rowRedirection={(row) => `${row?.noticeId || "GST-00061"}`}
       />
