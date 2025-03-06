@@ -1,7 +1,8 @@
 import { FaSync } from "react-icons/fa";
 
-export const API_BASE_URL = "http://localhost:4000/api/v1";
+// export const API_BASE_URL = "http://localhost:4000/api/v1";
 // export const API_BASE_URL = "http://192.168.1.52:4000/api/v1";
+export const API_BASE_URL = "http://34.132.54.218/api/method/";
 
 export const PATHS = {
   HOME: "/",
