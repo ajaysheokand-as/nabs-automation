@@ -1,22 +1,42 @@
 import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/PageTitle";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Table } from "../../components/Table";
 import AppContext from "../../context/AppContext";
 import { postData } from "../../api/apiService";
-import { Button, Checkbox, Modal } from "antd";
+import { Button, Checkbox, Divider, Modal } from "antd";
 import TextArea from "antd/es/input/TextArea";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import { LoadingOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 
 export const EPForm = () => {
   const { selectedEproceeding, setSelectedEproceeding } =
     useContext(AppContext);
   const [sendResponse, setSendResponse] = useState(false);
   const [maskedFields, setMaskedFields] = useState([]);
-  const [openResponseModal, setOpenResponseModal] = useState([]);
-  const [viewResponseLoading, setViewResponseLoading] = useState(true);
-  const [viewResponse, setViewResponse] = useState(null);
-  const [generatedResponse, setGeneratedResponse] = useState(null);
+  const [openResponseModal, setOpenResponseModal] = useState(false);
 
+  const [viewResponseLoading, setViewResponseLoading] = useState(false);
+  const [viewResponse, setViewResponse] = useState(null);
+
+  const [actualResponseLoading, setActualResponseLoading] = useState(false);
+
+  const [originalData, setOriginalData] = useState({});
+  const [isFormChanged, setIsFormChanged] = useState(false);
+  const [changedFields, setChangedFields] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const proceedingID = queryParams.get("proccedingID");
+
+  const decodedProceedingID = proceedingID
+    ? decodeURIComponent(proceedingID)
+    : null;
+
+  console.log("CHANGEDD FIELDS", changedFields);
   const fields = [
     "Name",
     "Email",
@@ -65,7 +85,26 @@ export const EPForm = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "response_message") {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setChangedFields((prev) => {
+      if (originalData[name] !== value) {
+        return { ...prev, [name]: value };
+      } else {
+        const updatedFields = { ...prev };
+        delete updatedFields[name];
+        return updatedFields;
+      }
+    });
+
+    setIsFormChanged(Object.keys(changedFields).length > 0);
   };
 
   const handleFileChange = (e) => {
@@ -88,26 +127,124 @@ export const EPForm = () => {
       id: selectedProceeding,
     });
     setFormData(data?.result);
+    setOriginalData(data?.result || {});
     console.log("data=>", data);
   };
 
-  useEffect(() => {
-    if (selectedEproceeding) {
-      getEproceedingDetails(selectedEproceeding);
+  const getViewResponseData = async (selectedProceeding) => {
+    try {
+      setViewResponseLoading(true);
+      const data = await postData(
+        "fin_buddy.events.incometax_gov.fetch_response_from_gpt",
+        {
+          doctype: "E Proceeding",
+          docname: selectedProceeding,
+          is_view_data_before_response_generation: "true",
+        }
+      );
+      if (data?.message) {
+        setViewResponse(data?.message?.data);
+        console.log("DATA", data);
+      }
+    } catch (err) {
+      console.log("Error", err);
+    } finally {
+      setTimeout(() => {
+        setViewResponseLoading(false);
+      }, 1000);
     }
-  }, [selectedEproceeding]);
+  };
+
+  const genrateActualResponse = async (selectedProceeding) => {
+    try {
+      setActualResponseLoading(true);
+      const data = await postData(
+        "fin_buddy.events.incometax_gov.fetch_response_from_gpt",
+        {
+          doctype: "E Proceeding",
+          docname: selectedProceeding,
+        }
+      );
+      if (data?.message) {
+        handleChange({
+          target: {
+            name: "response_message",
+            value: data?.message,
+          },
+        });
+        console.log("DATA", data);
+      }
+    } catch (err) {
+      console.log("Error", err);
+    } finally {
+      setTimeout(() => {
+        setActualResponseLoading(false);
+      }, 1000);
+    }
+  };
+
+  const saveChanges = async (decodedProceedingID) => {
+    try {
+      setLoading(true);
+      setActualResponseLoading(true);
+      const data = await postData("fin_buddy.api.save_document", {
+        doctype: "E Proceeding",
+        docname: decodedProceedingID,
+        document_data: changedFields,
+      });
+
+      toast.info("Saved Changes Successfully", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+
+      setChangedFields({});
+      setOriginalData({ ...formData });
+      setIsFormChanged(false);
+    } catch (err) {
+      toast.error("Error in Saving Changes ", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.log("Error", err);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    }
+  };
+  useEffect(() => {
+    if (decodedProceedingID) {
+      getEproceedingDetails(decodedProceedingID);
+    }
+    return () => {
+      setSelectedEproceeding(null);
+    };
+  }, [decodedProceedingID]);
 
   return (
     <>
       <PageTitle title="Details" />
       <div className="min-h-screen flex flex-col items-center justify-center bg-blue-100 p-6">
         <div className="w-full max-w-5xl bg-white shadow-lg rounded-2xl p-6">
-          <h2 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
-            Tax Notice Form
-          </h2>
+          <div className="flex justify-between w-full">
+            <h2 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
+              Tax Notice Form
+            </h2>
+            <Button
+              disabled={!isFormChanged || loading}
+              type="primary"
+              className="min-w-[100px]"
+              onClick={() => saveChanges(decodedProceedingID)}
+            >
+              {loading ? <LoadingOutlined spin /> : "Save"}
+            </Button>
+          </div>
+
+          <Divider style={{ margin: 0, borderWidth: "0.8px" }} />
 
           {/* Group 1 - Notice Details */}
-          <div className="mb-6 border-b border-gray-300 pb-6">
+          <div className="mb-6 border-b border-gray-300 pb-6 mt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Notice Details
             </h3>
@@ -119,7 +256,7 @@ export const EPForm = () => {
                 <input
                   type="text"
                   name="proceeding_name"
-                  readOnly={true}
+                  // readOnly={true}
                   value={formData.proceeding_name}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
@@ -132,7 +269,7 @@ export const EPForm = () => {
                 <input
                   type="text"
                   name="financial_year"
-                  readOnly={true}
+                  // readOnly={true}
                   value={formData.financial_year}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
@@ -144,6 +281,7 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
+                  readOnly
                   name="documentReference"
                   value={formData.documentReference}
                   onChange={handleChange}
@@ -378,6 +516,7 @@ export const EPForm = () => {
                 type="primary"
                 className="mt-4 mb-4"
                 onClick={() => {
+                  getViewResponseData(decodedProceedingID);
                   setOpenResponseModal(true);
                 }}
               >
@@ -385,7 +524,12 @@ export const EPForm = () => {
               </Button>
 
               {sendResponse && (
-                <Button variant="filled" type="primary" className="mt-4 mb-4">
+                <Button
+                  variant="filled"
+                  type="primary"
+                  className="mt-4 mb-4"
+                  onClick={() => genrateActualResponse(decodedProceedingID)}
+                >
                   Generate Response
                 </Button>
               )}
@@ -406,12 +550,18 @@ export const EPForm = () => {
               Response Message
             </h3>
             <div>
-              <textarea
-                name="response"
-                value={formData.response}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md"
-                rows={4} // Adjust rows as needed
+              <ReactQuill
+                theme="snow"
+                value={formData.response_message}
+                onChange={(value) =>
+                  handleChange({
+                    target: {
+                      name: "response_message",
+                      value: value,
+                    },
+                  })
+                }
+                className="bg-white w-full p-2 border rounded-md"
               />
             </div>
           </div>
@@ -420,6 +570,7 @@ export const EPForm = () => {
 
       <Modal
         title={"Data"}
+        width={900}
         footer={
           <Button
             type="primary"
@@ -432,9 +583,14 @@ export const EPForm = () => {
         }
         loading={viewResponseLoading}
         open={openResponseModal}
-        onCancel={() => setOpenResponseModal(false)}
+        onCancel={() => {
+          setOpenResponseModal(false);
+          setViewResponse(null);
+        }}
       >
-        Sample Data
+        <div className="max-h-[50vh] overflow-auto  bg-gray-200 rounded-lg p-4">
+          <pre>{viewResponse}</pre>
+        </div>
       </Modal>
     </>
   );

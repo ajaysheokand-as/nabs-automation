@@ -30,7 +30,11 @@ export const Table = ({
     if (rowRedirection && typeof rowRedirection === "function") {
       navigate(rowRedirection(data));
     } else if (rowRedirection && typeof rowRedirection === "string") {
-      navigate(rowRedirection);
+      if (type == "eproceeding") {
+        navigate(`${rowRedirection}?proccedingID=${data?.id}`);
+      } else {
+        navigate(rowRedirection);
+      }
     }
   };
 
