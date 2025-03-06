@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Table } from "../../components/Table";
 import AppContext from "../../context/AppContext";
 import { postData } from "../../api/apiService";
-import { Button, Checkbox, Divider, Modal } from "antd";
+import { Button, Checkbox, Divider, Modal, Tag } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
@@ -172,10 +172,17 @@ export const EPForm = () => {
             value: data?.message,
           },
         });
-        console.log("DATA", data);
+        toast.info("Genrated Response Successfully", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       }
     } catch (err) {
       console.log("Error", err);
+      toast.error("Error in Genrating Response", {
+        position: "top-right",
+        autoClose: 5000,
+      });
     } finally {
       setTimeout(() => {
         setActualResponseLoading(false);
@@ -228,9 +235,17 @@ export const EPForm = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-blue-100 p-6">
         <div className="w-full max-w-5xl bg-white shadow-lg rounded-2xl p-6">
           <div className="flex justify-between w-full">
-            <h2 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
-              Tax Notice Form
-            </h2>
+            <div className="flex gap-4 ">
+              <h2 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
+                Tax Notice Form
+              </h2>
+              {isFormChanged && (
+                <Tag color="red" style={{ height: "20px", marginTop: "5px" }}>
+                  Not Saved
+                </Tag>
+              )}
+            </div>
+
             <Button
               disabled={!isFormChanged || loading}
               type="primary"
@@ -527,10 +542,15 @@ export const EPForm = () => {
                 <Button
                   variant="filled"
                   type="primary"
-                  className="mt-4 mb-4"
+                  disabled={actualResponseLoading}
+                  className="mt-4 mb-4 min-w-[200px]"
                   onClick={() => genrateActualResponse(decodedProceedingID)}
                 >
-                  Generate Response
+                  {actualResponseLoading ? (
+                    <LoadingOutlined spin />
+                  ) : (
+                    "Generate Response"
+                  )}
                 </Button>
               )}
             </div>
