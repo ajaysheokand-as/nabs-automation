@@ -90,7 +90,7 @@ export const Gstin = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      {/* <div className="flex flex-wrap gap-2 mb-6">
         <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition cursor-pointer">
           Add Company
         </button>
@@ -103,7 +103,7 @@ export const Gstin = () => {
         <button className="px-4 py-2 border border-blue-500 text-blue-600 rounded-lg hover:bg-blue-500 hover:text-white transition cursor-pointer">
           Sync All
         </button>
-      </div>
+      </div> */}
 
       {/* Notice Summary Table & Calendar */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

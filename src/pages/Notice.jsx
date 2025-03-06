@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { Table } from "../components/Table";
 import PageTitle from "../components/PageTitle";
 import { ServiceType } from "../utils/enums";
@@ -26,34 +26,28 @@ export const Notice = ({ serviceType }) => {
       },
       cb: (data) => {
         setNotices(data?.result?.records || []);
+        console.log("Notice Data=>", data.result.records);
       },
     });
   }, []);
 
-  const columns = [
-    { label: "ID", key: "id" },
-    { label: "Name", key: "client" },
-    { label: "Assessment Year", key: "assessment_year" },
-    { label: "Notice Sent Date", key: "notice_sent_date" },
-    { label: "Staus", key: "proceeding_status" },
-    { label: "Due Date", key: "response_due_date" },
-    // {
-    //   label: "Action",
-    //   key: "",
-    //   render: (data) => {
-    //     console.log("data", data);
-    //     return (
-    //       <button
-    //         onClick={() => {
-    //           navigate(`${data?.id || "GST-00061"}`);
-    //         }}
-    //       >
-    //         View Details
-    //       </button>
-    //     );
-    //   },
-    // },
-  ];
+  const columns =
+    serviceType === "income-tax"
+      ? [
+          { label: "ID", key: "id" },
+          { label: "Client", key: "client" },
+          { label: "Assessment Year", key: "assessment_year" },
+          { label: "Notice Sent Date", key: "notice_sent_date" },
+          { label: "Status", key: "proceeding_status" },
+          { label: "Due Date", key: "response_due_date" },
+        ]
+      : [
+          { label: "Notice Id", key: "notice_id" },
+          { label: "Client", key: "client" },
+          { label: "Amount", key: "amount" },
+          { label: "Issue Date", key: "issue_date" },
+          { label: "Due Date", key: "due_date" },
+        ];
 
   const handleRowRedirection = (row) => {
     switch (serviceType) {
