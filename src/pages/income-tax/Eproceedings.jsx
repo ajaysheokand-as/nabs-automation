@@ -37,7 +37,7 @@ export const Eproceedings = () => {
         data={ePdataList}
         itemsPerPage={10}
         type="eproceeding"
-        rowRedirection={`/${ServiceType.GSTIN}/eproceeding-details`}
+        rowRedirection={`/${ServiceType.INCOME_TAX}/eproceeding-details`}
       />
     </>
   );

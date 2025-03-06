@@ -33,7 +33,7 @@ export const ClientView = () => {
             Response to Outstanding Demand
           </button>
           <button
-            onClick={() => navigate(`/${ServiceType.GSTIN}/eproceedings`)}
+            onClick={() => navigate(`/${ServiceType.INCOME_TAX}/eproceedings`)}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
           >
             E Proceeding{" "}
