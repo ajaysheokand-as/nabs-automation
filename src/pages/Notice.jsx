@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Table } from "../components/Table";
-import { postData } from "../api/apiService";
 import PageTitle from "../components/PageTitle";
 import { ServiceType } from "../utils/enums";
 import { useAxiosPost } from "../hooks/useAxios";
-import { useNavigate } from "react-router-dom";
 
 const urlMapping = {
   fetchClients: {
@@ -14,7 +12,6 @@ const urlMapping = {
 };
 
 export const Notice = ({ serviceType }) => {
-  const navigate = useNavigate();
   const [notices, setNotices] = useState([]);
   const [fetchNotices, { loading }] = useAxiosPost(
     urlMapping.fetchClients[serviceType]
@@ -58,6 +55,22 @@ export const Notice = ({ serviceType }) => {
     // },
   ];
 
+  const handleRowRedirection = (row) => {
+    switch (serviceType) {
+      case ServiceType.GSTIN:
+        return `${row?.noticeId || "GST-NTE-ODR-057"}`;
+
+      case ServiceType.INCOME_TAX:
+        return `${row?.noticeId}`;
+
+      case ServiceType.TDS:
+        return `${row?.noticeId}`;
+
+      default:
+        return "/404";
+    }
+  };
+
   return (
     <>
       <PageTitle title="Notices" />
@@ -66,7 +79,7 @@ export const Notice = ({ serviceType }) => {
         columns={columns}
         data={notices}
         itemsPerPage={10}
-        rowRedirection={(row) => `${row?.noticeId || "GST-00061"}`}
+        rowRedirection={handleRowRedirection}
       />
     </>
   );

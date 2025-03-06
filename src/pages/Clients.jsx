@@ -25,9 +25,7 @@ const urlMapping = {
 
 export const Clients = ({ serviceType }) => {
   const navigate = useNavigate();
-
   const [clientsData, setClientsData] = useState([]);
-
   const [fetchClientsData] = useAxiosPost(urlMapping.fetchClients[serviceType]);
 
   // const fetchClientsData = async () => {
