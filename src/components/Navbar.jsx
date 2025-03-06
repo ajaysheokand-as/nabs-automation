@@ -41,7 +41,7 @@ export const Navbar = () => {
               <FaServicestack /> <span>Outstanding Demands</span>
             </Link>
           </li> */}
-          <li>
+          {/* <li>
             <Link
               to={"/coming-soon"}
               className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition duration-300"
@@ -56,7 +56,7 @@ export const Navbar = () => {
             >
               <FaClipboardList /> <span>Reports</span>
             </Link>
-          </li>
+          </li> */}
         </ul>
 
         {/* Mobile Menu Button */}
