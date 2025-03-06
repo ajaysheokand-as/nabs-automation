@@ -58,7 +58,7 @@ export const Notice = ({ serviceType }) => {
   const handleRowRedirection = (row) => {
     switch (serviceType) {
       case ServiceType.GSTIN:
-        return `${row?.noticeId || "GST-NTE-ODR-057"}`;
+        return `${row?.noticeId || "GST-00061"}`;
 
       case ServiceType.INCOME_TAX:
         return `${row?.noticeId}`;

@@ -168,11 +168,11 @@ export const GSTNoticeDetails = () => {
             </table>
           </div>
 
-          <div className="mt-6 flex justify-end">
+          {/* <div className="mt-6 flex justify-end">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
               Submit
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </>
