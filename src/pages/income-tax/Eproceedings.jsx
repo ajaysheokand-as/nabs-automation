@@ -3,6 +3,7 @@ import { Table } from "../../components/Table";
 import PageTitle from "../../components/PageTitle";
 import { columns, data } from "../../utils/constants";
 import { postData } from "../../api/apiService";
+import { ServiceType } from "../../utils/enums";
 export const Eproceedings = () => {
   const [ePdataList, setEPDataList] = useState([]);
   const eProceedingsList = async () => {
@@ -35,7 +36,8 @@ export const Eproceedings = () => {
         columns={columns}
         data={ePdataList}
         itemsPerPage={10}
-        rowRedirection={"/eproceeding-details"}
+        type="eproceeding"
+        rowRedirection={`/${ServiceType.INCOME_TAX}/eproceeding-details`}
       />
     </>
   );

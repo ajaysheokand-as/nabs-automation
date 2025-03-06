@@ -1,30 +1,110 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/PageTitle";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Table } from "../../components/Table";
+import AppContext from "../../context/AppContext";
+import { postData } from "../../api/apiService";
+import { Button, Checkbox, Divider, Modal, Tag } from "antd";
+import TextArea from "antd/es/input/TextArea";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import { LoadingOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 
 export const EPForm = () => {
+  const { selectedEproceeding, setSelectedEproceeding } =
+    useContext(AppContext);
+  const [sendResponse, setSendResponse] = useState(false);
+  const [maskedFields, setMaskedFields] = useState([]);
+  const [openResponseModal, setOpenResponseModal] = useState(false);
+
+  const [viewResponseLoading, setViewResponseLoading] = useState(false);
+  const [viewResponse, setViewResponse] = useState(null);
+
+  const [actualResponseLoading, setActualResponseLoading] = useState(false);
+
+  const [originalData, setOriginalData] = useState({});
+  const [isFormChanged, setIsFormChanged] = useState(false);
+  const [changedFields, setChangedFields] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const proceedingID = queryParams.get("proccedingID");
+
+  const decodedProceedingID = proceedingID
+    ? decodeURIComponent(proceedingID)
+    : null;
+
+  console.log("CHANGEDD FIELDS", changedFields);
+  const fields = [
+    "Name",
+    "Email",
+    "Phone",
+    "Address",
+    "Date of Birth",
+    "PAN",
+    "Aadhaar",
+  ];
   const [formData, setFormData] = useState({
-    proceedingName: "Adjustment u/s 143(1)(a)",
-    assessmentYear: "2018-19",
+    id: "Adjustment u/s 143(1)(a)-00030",
     client: "IN-TAX-CLT-00029",
-    responseDueDate: "03-10-2019",
-    noticeSentDate: "03-09-2019",
-    documentReference: "",
-    noticeID: "",
-    noticeSection: "",
-    documentID: "",
-    taxPayerName: "",
-    department: "",
-    status: "",
-    remarks: "",
-    file: null,
-    response: "",
-    userInput: "",
+    proceeding_name: "Adjustment u/s 143(1)(a)",
+    assessment_year: "2019-20",
+    financial_year: "",
+    proceeding_status: "Active",
+    notice_din: "CPC/1920/G22/1967353344",
+    response_due_date: "2020-02-13",
+    notice_sent_date: "2020-01-14",
+    notice_section: "",
+    document_reference_id: "",
+    response_acknowledgement: "",
+    notice_letter:
+      "http://34.132.54.218/private/files/19205016735-AADxxxxx9K-G22.pdf",
+    user_input: "",
+    mask_this_data: "",
+    response_message: "",
+    is_terms_and_conditions_checked: 0,
+    owner: "Administrator",
+    modified_by: "Administrator",
+    creation: "2025-03-03 17:06:03.290923",
+    modified: "2025-03-03 17:06:03.483517",
+    replies: [],
+    other_documents: [],
   });
 
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+    setMaskedFields((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
+
+  const onSendResponseChange = (e) => {
+    setSendResponse(e.target.checked);
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "response_message") {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setChangedFields((prev) => {
+      if (originalData[name] !== value) {
+        return { ...prev, [name]: value };
+      } else {
+        const updatedFields = { ...prev };
+        delete updatedFields[name];
+        return updatedFields;
+      }
+    });
+
+    setIsFormChanged(Object.keys(changedFields).length > 0);
   };
 
   const handleFileChange = (e) => {
@@ -42,17 +122,144 @@ export const EPForm = () => {
     { label: "File", key: "file" },
   ];
 
+  const getEproceedingDetails = async (selectedProceeding) => {
+    const data = await postData("fin_buddy.api.e_proceeding_details", {
+      id: selectedProceeding,
+    });
+    setFormData(data?.result);
+    setOriginalData(data?.result || {});
+    console.log("data=>", data);
+  };
+
+  const getViewResponseData = async (selectedProceeding) => {
+    try {
+      setViewResponseLoading(true);
+      const data = await postData(
+        "fin_buddy.events.incometax_gov.fetch_response_from_gpt",
+        {
+          doctype: "E Proceeding",
+          docname: selectedProceeding,
+          is_view_data_before_response_generation: "true",
+        }
+      );
+      if (data?.message) {
+        setViewResponse(data?.message?.data);
+        console.log("DATA", data);
+      }
+    } catch (err) {
+      console.log("Error", err);
+    } finally {
+      setTimeout(() => {
+        setViewResponseLoading(false);
+      }, 1000);
+    }
+  };
+
+  const genrateActualResponse = async (selectedProceeding) => {
+    try {
+      setActualResponseLoading(true);
+      const data = await postData(
+        "fin_buddy.events.incometax_gov.fetch_response_from_gpt",
+        {
+          doctype: "E Proceeding",
+          docname: selectedProceeding,
+        }
+      );
+      if (data?.message) {
+        handleChange({
+          target: {
+            name: "response_message",
+            value: data?.message,
+          },
+        });
+        toast.info("Genrated Response Successfully", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (err) {
+      console.log("Error", err);
+      toast.error("Error in Genrating Response", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setTimeout(() => {
+        setActualResponseLoading(false);
+      }, 1000);
+    }
+  };
+
+  const saveChanges = async (decodedProceedingID) => {
+    try {
+      setLoading(true);
+      setActualResponseLoading(true);
+      const data = await postData("fin_buddy.api.save_document", {
+        doctype: "E Proceeding",
+        docname: decodedProceedingID,
+        document_data: changedFields,
+      });
+
+      toast.info("Saved Changes Successfully", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+
+      setChangedFields({});
+      setOriginalData({ ...formData });
+      setIsFormChanged(false);
+    } catch (err) {
+      toast.error("Error in Saving Changes ", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.log("Error", err);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    }
+  };
+  useEffect(() => {
+    if (decodedProceedingID) {
+      getEproceedingDetails(decodedProceedingID);
+    }
+    return () => {
+      setSelectedEproceeding(null);
+    };
+  }, [decodedProceedingID]);
+
   return (
     <>
       <PageTitle title="Details" />
       <div className="min-h-screen flex flex-col items-center justify-center bg-blue-100 p-6">
         <div className="w-full max-w-5xl bg-white shadow-lg rounded-2xl p-6">
-          <h2 className="text-2xl font-semibold text-blue-700 mb-4 text-center">
-            Tax Notice Form
-          </h2>
+          <div className="flex justify-between w-full">
+            <div className="flex gap-4 ">
+              <h2 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
+                Tax Notice Form
+              </h2>
+              {isFormChanged && (
+                <Tag color="red" style={{ height: "20px", marginTop: "5px" }}>
+                  Not Saved
+                </Tag>
+              )}
+            </div>
+
+            <Button
+              disabled={!isFormChanged || loading}
+              type="primary"
+              className="min-w-[100px]"
+              onClick={() => saveChanges(decodedProceedingID)}
+            >
+              {loading ? <LoadingOutlined spin /> : "Save"}
+            </Button>
+          </div>
+
+          <Divider style={{ margin: 0, borderWidth: "0.8px" }} />
 
           {/* Group 1 - Notice Details */}
-          <div className="mb-6 border-b border-gray-300 pb-6">
+          <div className="mb-6 border-b border-gray-300 pb-6 mt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Notice Details
             </h3>
@@ -63,8 +270,9 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
-                  name="noticeID"
-                  value={formData.noticeID}
+                  name="proceeding_name"
+                  // readOnly={true}
+                  value={formData.proceeding_name}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -75,8 +283,9 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
-                  name="noticeSection"
-                  value={formData.noticeSection}
+                  name="financial_year"
+                  // readOnly={true}
+                  value={formData.financial_year}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -87,6 +296,7 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
+                  readOnly
                   name="documentReference"
                   value={formData.documentReference}
                   onChange={handleChange}
@@ -98,9 +308,9 @@ export const EPForm = () => {
                   Client
                 </label>
                 <input
-                  type="date"
-                  name="responseDueDate"
-                  value={formData.responseDueDate}
+                  name="client"
+                  readOnly={true}
+                  value={formData.client}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -110,9 +320,8 @@ export const EPForm = () => {
                   Proceeding Status
                 </label>
                 <input
-                  type="date"
-                  name="noticeSentDate"
-                  value={formData.noticeSentDate}
+                  name="proceeding_status"
+                  value={formData.proceeding_status}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -132,8 +341,9 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
-                  name="client"
-                  value={formData.client}
+                  name="notice_din"
+                  readOnly={true}
+                  value={formData.notice_din}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -144,8 +354,9 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
-                  name="taxPayerName"
-                  value={formData.taxPayerName}
+                  name="notice_section"
+                  readOnly={true}
+                  value={formData.notice_section}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -156,8 +367,9 @@ export const EPForm = () => {
                 </label>
                 <input
                   type="text"
-                  name="department"
-                  value={formData.department}
+                  readOnly
+                  name="document_reference_id"
+                  value={formData.document_reference_id}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -171,9 +383,10 @@ export const EPForm = () => {
                   Response Due Date
                 </label>
                 <input
-                  type="date"
-                  name="responseDueDate"
-                  value={formData.responseDueDate}
+                  // type="date"
+                  readOnly
+                  name="response_due_date"
+                  value={formData.response_due_date}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -183,9 +396,10 @@ export const EPForm = () => {
                   Notice Sent Date
                 </label>
                 <input
-                  type="date"
-                  name="noticeSentDate"
-                  value={formData.noticeSentDate}
+                  readOnly
+                  // type="date"
+                  name="notice_sent_date"
+                  value={formData.notice_sent_date}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
                 />
@@ -204,7 +418,7 @@ export const EPForm = () => {
                     Notice/ Communication Reference ID
                   </label>
                   <a
-                    href="http://34.132.54.218/private/files/19060089176-AADxxxxx9K-G22%20(3).pdf"
+                    href={formData.notice_letter || ""}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline text-md"
@@ -214,8 +428,8 @@ export const EPForm = () => {
                 </div>
                 <input
                   type="text"
-                  name="proceedingName"
-                  value={formData.proceedingName}
+                  name="notice_din"
+                  value={formData.notice_din}
                   disabled
                   className="w-full p-2 border rounded-md bg-gray-100"
                 />
@@ -244,7 +458,8 @@ export const EPForm = () => {
             </h3>
             <Table
               columns={columns}
-              data={data}
+              data={formData?.replies}
+              type="replies"
               itemsPerPage={10}
               isPagination={0}
             />
@@ -270,7 +485,8 @@ export const EPForm = () => {
               </label>
               <Table
                 columns={columns}
-                data={data}
+                data={formData?.other_documents}
+                type="documents"
                 itemsPerPage={10}
                 isPagination={0}
               />
@@ -281,60 +497,121 @@ export const EPForm = () => {
               Mask Data
             </label>
             <div className="flex flex-wrap gap-4">
-              {[
-                "Name",
-                "Email",
-                "Phone",
-                "Address",
-                "Date of Birth",
-                "PAN",
-                "Aadhaar",
-              ].map((item, index) => (
-                <label key={index} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+              {fields.map((item, index) => {
+                const value = item.toLowerCase().replace(/\s/g, "_");
+                return (
+                  <Checkbox
+                    key={index}
                     name="maskData"
-                    value={item.toLowerCase().replace(/\s/g, "_")}
+                    value={value}
                     className="rounded"
-                    checked={1}
-                  />
-                  <span>{item}</span>
-                </label>
-              ))}
+                    checked={maskedFields.includes(value)}
+                    onChange={handleCheckboxChange}
+                  >
+                    {item}
+                  </Checkbox>
+                );
+              })}
             </div>
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                name="maskData"
-                value="1"
-                className="rounded"
-                // checked = {1}
-              />
-              <span>Send your data to AI Model for response generation?</span>
-            </label>
+            {maskedFields.includes("name") && (
+              <div className="mt-4">
+                <TextArea
+                  variant="filled"
+                  placeholder="Enter the names you want to mash in comma separated format here. (Example : name1, name2, name3)"
+                  autoSize={{
+                    minRows: 4,
+                    maxRows: 6,
+                  }}
+                />
+              </div>
+            )}
+
+            <div className="flex items-center gap-8 ">
+              <Button
+                type="primary"
+                className="mt-4 mb-4"
+                onClick={() => {
+                  getViewResponseData(decodedProceedingID);
+                  setOpenResponseModal(true);
+                }}
+              >
+                View Data Before Response Generation
+              </Button>
+
+              {sendResponse && (
+                <Button
+                  variant="filled"
+                  type="primary"
+                  disabled={actualResponseLoading}
+                  className="mt-4 mb-4 min-w-[200px]"
+                  onClick={() => genrateActualResponse(decodedProceedingID)}
+                >
+                  {actualResponseLoading ? (
+                    <LoadingOutlined spin />
+                  ) : (
+                    "Generate Response"
+                  )}
+                </Button>
+              )}
+            </div>
+
+            <p style={{ marginBottom: "20px" }}>
+              <Checkbox
+                checked={sendResponse}
+                // disabled={disabled}
+                onChange={onSendResponseChange}
+              >
+                Send your data to AI Model for response generation?
+              </Checkbox>
+            </p>
           </div>
           <div className="mb-6 border-b border-gray-300 pb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Response Message
             </h3>
             <div>
-              {/* <label className="block text-gray-700 font-medium">User Input</label> */}
-              <textarea
-                name="response"
-                value={formData.response}
-                onChange={handleChange}
-                className="w-full p-2 border rounded-md"
-                rows={4} // Adjust rows as needed
+              <ReactQuill
+                theme="snow"
+                value={formData.response_message}
+                onChange={(value) =>
+                  handleChange({
+                    target: {
+                      name: "response_message",
+                      value: value,
+                    },
+                  })
+                }
+                className="bg-white w-full p-2 border rounded-md"
               />
             </div>
           </div>
-          <div className="mt-6 flex justify-end">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-              Submit
-            </button>
-          </div>
         </div>
       </div>
+
+      <Modal
+        title={"Data"}
+        width={900}
+        footer={
+          <Button
+            type="primary"
+            onClick={() => {
+              setOpenResponseModal(false);
+            }}
+          >
+            Close
+          </Button>
+        }
+        loading={viewResponseLoading}
+        open={openResponseModal}
+        onCancel={() => {
+          setOpenResponseModal(false);
+          setViewResponse(null);
+        }}
+      >
+        <div className="max-h-[50vh] overflow-auto  bg-gray-200 rounded-lg p-4">
+          <pre>{viewResponse}</pre>
+        </div>
+      </Modal>
     </>
   );
 };

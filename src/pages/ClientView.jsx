@@ -1,6 +1,7 @@
-import React, {useState} from 'react'
+import React, { useState } from "react";
 import PageTitle from "../components/PageTitle";
 import { useNavigate } from "react-router-dom";
+import { ServiceType } from "../utils/enums";
 
 export const ClientView = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export const ClientView = () => {
             Response to Outstanding Demand
           </button>
           <button
-            onClick={() => navigate("/eproceedings")}
+            onClick={() => navigate(`/${ServiceType.INCOME_TAX}/eproceedings`)}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
           >
             E Proceeding{" "}

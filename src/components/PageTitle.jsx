@@ -6,7 +6,7 @@ const PageTitle = ({ title }) => {
   const navigate = useNavigate();
 
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 flex items-center justify-center relative shadow-md">
+    <header className="bg-gradient-to-r from-blue-900 to-blue-600 text-white p-4 flex items-center justify-center relative shadow-md">
       <button
         onClick={() => {
           navigate(-1);
