@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "../components/Table";
-import { postData } from "../api/apiService";
 import PageTitle from "../components/PageTitle";
 import { ServiceType } from "../utils/enums";
 import { useAxiosPost } from "../hooks/useAxios";
-import { useNavigate } from "react-router-dom";
 
 const urlMapping = {
   fetchClients: {
@@ -14,7 +12,6 @@ const urlMapping = {
 };
 
 export const Notice = ({ serviceType }) => {
-  const navigate = useNavigate();
   const [notices, setNotices] = useState([]);
   const [fetchNotices, { loading }] = useAxiosPost(
     urlMapping.fetchClients[serviceType]
@@ -29,34 +26,44 @@ export const Notice = ({ serviceType }) => {
       },
       cb: (data) => {
         setNotices(data?.result?.records || []);
+        console.log("Notice Data=>", data.result.records);
       },
     });
   }, []);
 
-  const columns = [
-    { label: "ID", key: "id" },
-    { label: "Name", key: "client" },
-    { label: "Assessment Year", key: "assessment_year" },
-    { label: "Notice Sent Date", key: "notice_sent_date" },
-    { label: "Staus", key: "proceeding_status" },
-    { label: "Due Date", key: "response_due_date" },
-    // {
-    //   label: "Action",
-    //   key: "",
-    //   render: (data) => {
-    //     console.log("data", data);
-    //     return (
-    //       <button
-    //         onClick={() => {
-    //           navigate(`${data?.id || "GST-00061"}`);
-    //         }}
-    //       >
-    //         View Details
-    //       </button>
-    //     );
-    //   },
-    // },
-  ];
+  const columns =
+    serviceType === "income-tax"
+      ? [
+          { label: "ID", key: "id" },
+          { label: "Client", key: "client" },
+          { label: "Assessment Year", key: "assessment_year" },
+          { label: "Notice Sent Date", key: "notice_sent_date" },
+          { label: "Status", key: "proceeding_status" },
+          { label: "Due Date", key: "response_due_date" },
+        ]
+      : [
+          { label: "Notice Id", key: "notice_id" },
+          { label: "Client", key: "client" },
+          { label: "Amount", key: "amount" },
+          { label: "Issue Date", key: "issue_date" },
+          { label: "Due Date", key: "due_date" },
+        ];
+
+  const handleRowRedirection = (row) => {
+    switch (serviceType) {
+      case ServiceType.GSTIN:
+        return `${row?.noticeId || "GST-00061"}`;
+
+      case ServiceType.INCOME_TAX:
+        return `${row?.noticeId}`;
+
+      case ServiceType.TDS:
+        return `${row?.noticeId}`;
+
+      default:
+        return "/404";
+    }
+  };
 
   return (
     <>
@@ -67,7 +74,7 @@ export const Notice = ({ serviceType }) => {
         data={notices}
         type="notices"
         itemsPerPage={10}
-        rowRedirection={(row) => `${row?.noticeId || "GST-00061"}`}
+        rowRedirection={handleRowRedirection}
       />
     </>
   );

@@ -25,9 +25,7 @@ const urlMapping = {
 
 export const Clients = ({ serviceType }) => {
   const navigate = useNavigate();
-
   const [clientsData, setClientsData] = useState([]);
-
   const [fetchClientsData] = useAxiosPost(urlMapping.fetchClients[serviceType]);
 
   // const fetchClientsData = async () => {
@@ -54,6 +52,22 @@ export const Clients = ({ serviceType }) => {
     });
   }, []);
 
+  const handleRowRedirection = (row) => {
+    switch (serviceType) {
+      case ServiceType.GSTIN:
+        return `${row?.id}`;
+
+      case ServiceType.INCOME_TAX:
+        return `${row?.id}`;
+
+      case ServiceType.TDS:
+        return `${row?.id}`;
+
+      default:
+        return "/404";
+    }
+  };
+
   return (
     <>
       <PageTitle title="All Clients" navigate={() => navigate(-1)} />
@@ -77,7 +91,7 @@ export const Clients = ({ serviceType }) => {
         data={clientsData}
         type="clients"
         itemsPerPage={10}
-        rowRedirection={"/gstin/client-view/2112"}
+        rowRedirection={handleRowRedirection}
       />
     </>
   );
