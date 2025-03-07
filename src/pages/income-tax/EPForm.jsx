@@ -15,6 +15,7 @@ import WarningImage from "../../assets/images/Warning.png";
 export const EPForm = () => {
   const { selectedEproceeding, setSelectedEproceeding } =
     useContext(AppContext);
+
   const [sendResponse, setSendResponse] = useState(false);
   const [maskedFields, setMaskedFields] = useState([]);
   const [showMaskedData, setShowMaskedData] = useState(false);
@@ -204,7 +205,7 @@ export const EPForm = () => {
   const saveChanges = async (decodedProceedingID) => {
     try {
       setLoading(true);
-      setActualResponseLoading(true);
+
       const data = await postData("fin_buddy.api.save_document", {
         doctype: "E Proceeding",
         docname: decodedProceedingID,
@@ -232,33 +233,6 @@ export const EPForm = () => {
     }
   };
 
-  const insertUnmaskedData = () => {
-    const data = `
-    <p><strong>Ref:</strong> Notice File No. <strong>19002345678</strong></p>
-    <p><strong>Date:</strong> 07-03-2025</p>
-    <p><strong>To,</strong><br>Asst. Director of Income Tax, CPC</p>
-    <p><strong>Subject:</strong> Response to proposed adjustment u/s 143(1)(a) of Income Tax Act, 1961</p>
-    <p>Dear Sir/Madam,</p>
-    <p>
-        I, on behalf of <strong>XYZ CONSTRUCTIONS PRIVATE LIMITED</strong>, acknowledge the receipt of the 
-        communication regarding the proposed adjustments under section 143(1)(a) of the Income Tax Act, 1961.
-    </p>
-    <p>
-        We hereby confirm that we have already filed a revised return in response to the earlier 
-        communication dated <strong>15-02-2025</strong>. Therefore, we kindly request you to consider 
-        the revised return already submitted and refrain from making any further adjustments.
-    </p>
-    <p>Thank you for your attention to this matter.</p>
-    <p><strong>Yours faithfully,</strong></p>
-    <p>[Signature]</p>
-    <p><strong>XYZ CONSTRUCTIONS PRIVATE LIMITED</strong><br>
-       H.No. 2456, Sector 21<br>
-       Gurgaon, Haryana - 122001
-    </p>
-`;
-    setUnmaskedResponse(data);
-  };
-
   const showModal = () => {
     setIsSubmitModalOpen(true);
   };
@@ -280,6 +254,14 @@ export const EPForm = () => {
     };
   }, [decodedProceedingID]);
 
+  useEffect(() => {
+    if (isFormChanged) {
+      setTimeout(() => {
+        saveChanges(decodedProceedingID);
+      }, 2000);
+    }
+  }, [isFormChanged]);
+
   return (
     <>
       <PageTitle title="Details" />
@@ -297,14 +279,14 @@ export const EPForm = () => {
               )}
             </div>
 
-            <Button
+            {/* <Button
               disabled={!isFormChanged || loading}
               type="primary"
               className="min-w-[100px]"
               onClick={() => saveChanges(decodedProceedingID)}
             >
               {loading ? <LoadingOutlined spin /> : "Save"}
-            </Button>
+            </Button> */}
           </div>
 
           <Divider style={{ margin: 0, borderWidth: "0.8px" }} />
@@ -582,7 +564,10 @@ export const EPForm = () => {
               <div className="mt-4">
                 <TextArea
                   variant="filled"
-                  placeholder="Enter the names you want to mash in comma separated format here. (Example : name1, name2, name3)"
+                  name="mask_this_data"
+                  value={formData.mask_this_data}
+                  onChange={handleChange}
+                  placeholder="Enter the names you want to mask in comma separated format here. (Example : name1, name2, name3)"
                   autoSize={{
                     minRows: 4,
                     maxRows: 6,
@@ -637,15 +622,10 @@ export const EPForm = () => {
               <Button
                 variant="filled"
                 type="primary"
-                disabled={actualResponseLoading}
                 className="my-4 min-w-[200px]"
                 onClick={() => setOpenTandCModal(true)}
               >
-                {actualResponseLoading ? (
-                  <LoadingOutlined spin />
-                ) : (
-                  "Generate Response"
-                )}
+                Generate Response
               </Button>
             )}
           </div>
