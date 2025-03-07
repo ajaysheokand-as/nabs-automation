@@ -141,3 +141,66 @@ export const columns = [
   { label: "Last Sync", key: "last_income_tax_sync" },
   // { label: "Action", key: "action" },
 ];
+
+export const ResponseOutstandingFormBlueprint = {
+  section1: [
+    { label: "Client", name: "client" },
+    { label: "Assessment Year", name: "assessment_year" },
+    { label: "Rectification Rights", name: "rectification_rights" },
+    { label: "Outstanding Demand Amount", name: "outstanding_demand_amount" },
+  ],
+  section2: [
+    { label: "Notice ID", name: "id" },
+    { label: "Demand Reference Number", name: "demand_reference_no" },
+  ],
+  section3: [],
+  section4: [{ label: "Notice ID", name: "id" }],
+  section5: [],
+};
+
+export const NoticeFormBlueprint = {
+  section1: [
+    { label: "Client", name: "client" },
+    { label: "ID", name: "id" },
+    { label: "Amount", name: "amount" },
+    { label: "Type", name: "type" },
+    { label: "Description", name: "description" },
+  ],
+  section2: [{ label: "Notice ID", name: "notice_id" }],
+  section3: [
+    { label: "Issued By", name: "issued_by" },
+    { label: "Issued Date", name: "issue_date" },
+    { label: "Due Date", name: "due_date" },
+  ],
+  section4: [{ label: "Notice ID", name: "id" }],
+  section5: [],
+};
+
+export const EproceedingsFormBlueprint = {
+  section1: [
+    { label: "Proceeding Name", name: "client" },
+    { label: "Assessment Year", name: "assessment_year" },
+    { label: "Financial Year", name: "financial_year" },
+    { label: "Client", name: "client" },
+    { label: "Proceeding Status", name: "proceeding_status" },
+  ],
+  section2: [
+    { label: "Notice/ Communication Reference ID", name: "notice_din" },
+    { label: "Notice Section", name: "notice_section" },
+    { label: "Document reference ID", name: "document_reference_id" },
+  ],
+  section3: [
+    { label: "Response Due Date", name: "response_due_date" },
+    { label: "Notice Sent Date", name: "notice_sent_date" },
+  ],
+  section4: [
+    { label: "Notice/ Communication Reference ID", name: "notice_din" },
+  ],
+  section5: [
+    {
+      label: "Previous Replies",
+      name: "replies",
+      sectionHeader: "Previous Replies",
+    },
+  ],
+};

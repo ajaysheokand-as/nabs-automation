@@ -36,7 +36,15 @@ export const Table = ({
       }
     } else if (rowRedirection && typeof rowRedirection === "string") {
       if (type == "eproceeding") {
-        navigate(`${rowRedirection}?proccedingID=${data?.id}`);
+        navigate(
+          `${rowRedirection}?proceedingID=${data?.id}&formType=eproceedings`
+        );
+      } else if (type == "responseoutstandings") {
+        navigate(
+          `${rowRedirection}?responseID=${data?.id}&formType=responseOutstandings`
+        );
+      } else if (type == "notices") {
+        navigate(`${rowRedirection}?noticeID=${data?.id}&formType=notices`);
       } else {
         navigate(rowRedirection);
       }
