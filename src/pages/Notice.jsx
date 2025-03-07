@@ -8,6 +8,7 @@ const urlMapping = {
   fetchClients: {
     [ServiceType.GSTIN]: "fin_buddy.api.gst_notice_list",
     [ServiceType.TDS]: "fin_buddy.api.tds_notice_list",
+    [ServiceType.INCOME_TAX]: "fin_buddy.api.income_tax_notice_list",
   },
 };
 
@@ -26,7 +27,7 @@ export const Notice = ({ serviceType }) => {
       },
       cb: (data) => {
         setNotices(data?.result?.records || []);
-        console.log("Notice Data=>", data.result.records);
+        console.log("Notice Data=>", data?.result?.records);
       },
     });
   }, []);
