@@ -50,9 +50,15 @@ export const ClientView = ({ serviceType }) => {
         {/* Buttons */}
         {serviceType === ServiceType.INCOME_TAX && (
           <div className="flex justify-between mb-6">
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer">
+            <button
+              onClick={() =>
+                navigate(`/${serviceType}/responseoutstandings/${clientId}`)
+              }
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            >
               Response to Outstanding Demand
             </button>
+
             <button
               onClick={() =>
                 navigate(`/${serviceType}/eproceedings/${clientId}`)

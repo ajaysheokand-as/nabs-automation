@@ -16,6 +16,7 @@ import { MainLayout } from "./layouts/MainLayout";
 import Error404 from "./pages/Error404";
 import { ServiceType } from "./utils/enums";
 import { GSTNoticeDetails } from "./pages/gst/GSTNoticeDetails";
+import { ResponseOutstandings } from "./pages/income-tax/RODemands";
 
 function App() {
   return (
@@ -85,6 +86,12 @@ function App() {
           <Route
             path="eproceeding-details"
             element={<EPForm serviceType={ServiceType.INCOME_TAX} />}
+          />
+          <Route
+            path="responseoutstandings/:clientId"
+            element={
+              <ResponseOutstandings serviceType={ServiceType.INCOME_TAX} />
+            }
           />
         </Route>
 

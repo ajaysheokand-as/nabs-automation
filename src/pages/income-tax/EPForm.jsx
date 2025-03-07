@@ -4,24 +4,28 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Table } from "../../components/Table";
 import AppContext from "../../context/AppContext";
 import { postData } from "../../api/apiService";
-import { Button, Checkbox, Divider, Modal, Tag } from "antd";
+import { Button, Checkbox, Divider, Modal, Tag, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import WarningImage from "../../assets/images/Warning.png";
 
 export const EPForm = () => {
   const { selectedEproceeding, setSelectedEproceeding } =
     useContext(AppContext);
   const [sendResponse, setSendResponse] = useState(false);
   const [maskedFields, setMaskedFields] = useState([]);
-  const [openResponseModal, setOpenResponseModal] = useState(false);
+  const [showMaskedData, setShowMaskedData] = useState(false);
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
   const [viewResponseLoading, setViewResponseLoading] = useState(false);
   const [viewResponse, setViewResponse] = useState(null);
 
   const [actualResponseLoading, setActualResponseLoading] = useState(false);
+  const [unmaskedDataLoading, setUnmaskedDataLoading] = useState(false);
+  const [unmaskedResponse, setUnmaskedResponse] = useState(null);
 
   const [originalData, setOriginalData] = useState({});
   const [isFormChanged, setIsFormChanged] = useState(false);
@@ -36,7 +40,8 @@ export const EPForm = () => {
     ? decodeURIComponent(proceedingID)
     : null;
 
-  console.log("CHANGEDD FIELDS", changedFields);
+  const { Text } = Typography;
+
   const fields = [
     "Name",
     "Email",
@@ -220,6 +225,46 @@ export const EPForm = () => {
       }, 1000);
     }
   };
+
+  const insertUnmaskedData = () => {
+    const data = `
+    <p><strong>Ref:</strong> Notice File No. <strong>19002345678</strong></p>
+    <p><strong>Date:</strong> 07-03-2025</p>
+    <p><strong>To,</strong><br>Asst. Director of Income Tax, CPC</p>
+    <p><strong>Subject:</strong> Response to proposed adjustment u/s 143(1)(a) of Income Tax Act, 1961</p>
+    <p>Dear Sir/Madam,</p>
+    <p>
+        I, on behalf of <strong>XYZ CONSTRUCTIONS PRIVATE LIMITED</strong>, acknowledge the receipt of the 
+        communication regarding the proposed adjustments under section 143(1)(a) of the Income Tax Act, 1961.
+    </p>
+    <p>
+        We hereby confirm that we have already filed a revised return in response to the earlier 
+        communication dated <strong>15-02-2025</strong>. Therefore, we kindly request you to consider 
+        the revised return already submitted and refrain from making any further adjustments.
+    </p>
+    <p>Thank you for your attention to this matter.</p>
+    <p><strong>Yours faithfully,</strong></p>
+    <p>[Signature]</p>
+    <p><strong>XYZ CONSTRUCTIONS PRIVATE LIMITED</strong><br>
+       H.No. 2456, Sector 21<br>
+       Gurgaon, Haryana - 122001
+    </p>
+`;
+    setUnmaskedResponse(data);
+  };
+
+  const showModal = () => {
+    setIsSubmitModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsSubmitModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsSubmitModalOpen(false);
+  };
+
   useEffect(() => {
     if (decodedProceedingID) {
       getEproceedingDetails(decodedProceedingID);
@@ -532,30 +577,33 @@ export const EPForm = () => {
                 className="mt-4 mb-4"
                 onClick={() => {
                   getViewResponseData(decodedProceedingID);
-                  setOpenResponseModal(true);
+                  setShowMaskedData(true);
                 }}
               >
                 View Data Before Response Generation
               </Button>
-
-              {sendResponse && (
-                <Button
-                  variant="filled"
-                  type="primary"
-                  disabled={actualResponseLoading}
-                  className="mt-4 mb-4 min-w-[200px]"
-                  onClick={() => genrateActualResponse(decodedProceedingID)}
-                >
-                  {actualResponseLoading ? (
-                    <LoadingOutlined spin />
-                  ) : (
-                    "Generate Response"
-                  )}
-                </Button>
-              )}
             </div>
 
-            <p style={{ marginBottom: "20px" }}>
+            {showMaskedData && (
+              <>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  Masked Data
+                </h3>
+                <div className="max-h-[50vh] overflow-auto  bg-gray-200 rounded-lg p-4 w-full">
+                  <pre>
+                    {viewResponseLoading ? (
+                      <div className="w-full  flex justify-center items-center h-[40vh]">
+                        <LoadingOutlined spin style={{ fontSize: "30px" }} />
+                      </div>
+                    ) : (
+                      viewResponse
+                    )}
+                  </pre>
+                </div>
+              </>
+            )}
+
+            <p style={{ margin: "20px 0px" }}>
               <Checkbox
                 checked={sendResponse}
                 // disabled={disabled}
@@ -564,8 +612,24 @@ export const EPForm = () => {
                 Send your data to AI Model for response generation?
               </Checkbox>
             </p>
+
+            {sendResponse && (
+              <Button
+                variant="filled"
+                type="primary"
+                disabled={actualResponseLoading}
+                className="mb-4 min-w-[200px]"
+                onClick={() => genrateActualResponse(decodedProceedingID)}
+              >
+                {actualResponseLoading ? (
+                  <LoadingOutlined spin />
+                ) : (
+                  "Generate Response"
+                )}
+              </Button>
+            )}
           </div>
-          <div className="mb-6 border-b border-gray-300 pb-6">
+          <div className="mb-6  pb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Response Message
             </h3>
@@ -585,31 +649,70 @@ export const EPForm = () => {
               />
             </div>
           </div>
+
+          {viewResponse && (
+            <Button
+              variant="filled"
+              type="primary"
+              disabled={unmaskedDataLoading}
+              className="mb-4 min-w-[200px]"
+              onClick={() => {
+                insertUnmaskedData();
+              }}
+            >
+              {unmaskedDataLoading ? (
+                <LoadingOutlined spin />
+              ) : (
+                "View Unmasked Data"
+              )}
+            </Button>
+          )}
+
+          {unmaskedResponse && (
+            <div className="border-b border-gray-300">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Unmasked Data
+              </h3>
+              <ReactQuill
+                theme="snow"
+                value={unmaskedResponse}
+                onChange={(value) => setUnmaskedResponse(value)}
+                className="bg-white w-full p-2 border rounded-md"
+              />
+            </div>
+          )}
+
+          <Divider style={{ borderWidth: "0.8" }} />
+          <div className="w-full flex justify-end">
+            <Button
+              variant="filled"
+              type="primary"
+              disabled={
+                formData.response_message == null ||
+                formData.response_message == ""
+              }
+              className="mb-4 min-w-[200px]"
+              onClick={() => {
+                showModal();
+              }}
+            >
+              Submit Response
+            </Button>
+          </div>
         </div>
       </div>
 
       <Modal
-        title={"Data"}
-        width={900}
-        footer={
-          <Button
-            type="primary"
-            onClick={() => {
-              setOpenResponseModal(false);
-            }}
-          >
-            Close
-          </Button>
-        }
-        loading={viewResponseLoading}
-        open={openResponseModal}
-        onCancel={() => {
-          setOpenResponseModal(false);
-          setViewResponse(null);
-        }}
+        title=""
+        open={isSubmitModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        centered
+        style={{ top: -50 }}
       >
-        <div className="max-h-[50vh] overflow-auto  bg-gray-200 rounded-lg p-4">
-          <pre>{viewResponse}</pre>
+        <div className="flex items-center justify-center flex-col">
+          <img src={WarningImage} width={250} height={250} />
+          <p>Are you sure you want to submit response?</p>
         </div>
       </Modal>
     </>
