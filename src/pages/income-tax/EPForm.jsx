@@ -26,6 +26,8 @@ export const EPForm = () => {
   const [actualResponseLoading, setActualResponseLoading] = useState(false);
   const [unmaskedDataLoading, setUnmaskedDataLoading] = useState(false);
   const [unmaskedResponse, setUnmaskedResponse] = useState(null);
+  const [openTandCModal, setOpenTandCModal] = useState(false);
+  const [accepted, setAccepted] = useState(false);
 
   const [originalData, setOriginalData] = useState({});
   const [isFormChanged, setIsFormChanged] = useState(false);
@@ -150,6 +152,7 @@ export const EPForm = () => {
       );
       if (data?.message) {
         setViewResponse(data?.message?.data);
+        setSendResponse(true);
         console.log("DATA", data);
       }
     } catch (err) {
@@ -192,6 +195,7 @@ export const EPForm = () => {
     } finally {
       setTimeout(() => {
         setActualResponseLoading(false);
+        setOpenTandCModal(false);
       }, 1000);
     }
   };
@@ -628,13 +632,13 @@ export const EPForm = () => {
               </Checkbox>
             </p>
 
-            {
+            {sendResponse && (
               <Button
                 variant="filled"
                 type="primary"
                 disabled={actualResponseLoading}
                 className="mb-4 min-w-[200px]"
-                onClick={() => genrateActualResponse(decodedProceedingID)}
+                onClick={() => setOpenTandCModal(true)}
               >
                 {actualResponseLoading ? (
                   <LoadingOutlined spin />
@@ -642,7 +646,7 @@ export const EPForm = () => {
                   "Generate Response"
                 )}
               </Button>
-            }
+            )}
           </div>
           {formData.response_message && (
             <div className="mb-6  pb-6">
@@ -667,7 +671,7 @@ export const EPForm = () => {
             </div>
           )}
 
-          {viewResponse && (
+          {/* {viewResponse && (
             <Button
               variant="filled"
               type="primary"
@@ -683,9 +687,9 @@ export const EPForm = () => {
                 "View Unmasked Data"
               )}
             </Button>
-          )}
+          )} */}
 
-          {unmaskedResponse && (
+          {/* {unmaskedResponse && (
             <div className="border-b border-gray-300">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Unmasked Data
@@ -697,7 +701,7 @@ export const EPForm = () => {
                 className="bg-white w-full p-2 border rounded-md"
               />
             </div>
-          )}
+          )} */}
 
           <Divider style={{ borderWidth: "0.8" }} />
           <div className="w-full flex justify-end">
@@ -730,6 +734,71 @@ export const EPForm = () => {
         <div className="flex items-center justify-center flex-col">
           <img src={WarningImage} width={250} height={250} />
           <p>Are you sure you want to submit response?</p>
+        </div>
+      </Modal>
+
+      <Modal
+        title="Terms and Conditions"
+        open={openTandCModal}
+        onCancel={() => setOpenTandCModal(false)}
+        footer={null}
+        centered
+        style={{ minHeight: "500px" }}
+      >
+        <div style={{ maxHeight: "400px", overflowY: "auto", padding: "10px" }}>
+          <h3>Sample Terms and Conditions</h3>
+          <p>
+            <strong>1. Acceptance of Terms:</strong> By using this service, you
+            acknowledge and agree to comply with all applicable laws and
+            regulations. Failure to adhere may result in suspension or
+            termination of access.
+          </p>
+          <p>
+            <em>2. Modification of Terms:</em> We reserve the right to modify
+            these terms at any time without prior notice. Changes will be
+            effective immediately upon posting on our platform.
+          </p>
+          <p>
+            <strong>3. User Responsibilities:</strong> You must ensure that your
+            use of the platform aligns with ethical standards and does not
+            violate any policies.
+          </p>
+          <p>
+            4. <em>Privacy and Data Collection:</em> We may collect and process
+            personal data as per our privacy policy. It is your responsibility
+            to review the policy and understand how your data is handled.
+          </p>
+          <p>
+            <strong>5. Service Availability:</strong> While we strive to provide
+            uninterrupted access, we do not guarantee that the service will
+            always be available, secure, or error-free.
+          </p>
+          <p>
+            <em>6. Intellectual Property:</em> All content, trademarks, and data
+            available on this platform remain the property of the respective
+            owners and should not be used without permission.
+          </p>
+          <p>
+            7. <strong>Limitation of Liability:</strong> We shall not be liable
+            for any direct, indirect, incidental, or consequential damages
+            arising from the use of our services.
+          </p>
+        </div>
+        <div className="mt-6">
+          <Checkbox onChange={(e) => setAccepted(e.target.checked)}>
+            I accept the Terms and Conditions
+          </Checkbox>
+        </div>
+
+        <div style={{ textAlign: "right", marginTop: "10px" }}>
+          <Button
+            type="primary"
+            disabled={!accepted || actualResponseLoading}
+            onClick={() => genrateActualResponse(decodedProceedingID)}
+            className="min-w-[100px]"
+          >
+            {actualResponseLoading ? <LoadingOutlined spin /> : "Generate "}
+          </Button>
         </div>
       </Modal>
     </>
