@@ -53,6 +53,7 @@ export const EPForm = () => {
     "Date of Birth",
     "PAN",
     "Aadhaar",
+    "Other",
   ];
   const [formData, setFormData] = useState({
     id: "Adjustment u/s 143(1)(a)-00030",
@@ -577,7 +578,7 @@ export const EPForm = () => {
                 );
               })}
             </div>
-            {maskedFields.includes("name") && (
+            {maskedFields.includes("other") && (
               <div className="mt-4">
                 <TextArea
                   variant="filled"
@@ -622,22 +623,22 @@ export const EPForm = () => {
               </>
             )}
 
-            <p style={{ margin: "20px 0px" }}>
+            {/* <p style={{ margin: "20px 0px" }}>
               <Checkbox
                 checked={sendResponse}
-                // disabled={disabled}
+                disabled={disabled}
                 onChange={onSendResponseChange}
               >
                 Send your data to AI Model for response generation?
               </Checkbox>
-            </p>
+            </p> */}
 
             {sendResponse && (
               <Button
                 variant="filled"
                 type="primary"
                 disabled={actualResponseLoading}
-                className="mb-4 min-w-[200px]"
+                className="my-4 min-w-[200px]"
                 onClick={() => setOpenTandCModal(true)}
               >
                 {actualResponseLoading ? (
