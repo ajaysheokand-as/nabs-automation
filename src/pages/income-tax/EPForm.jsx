@@ -11,8 +11,9 @@ import "react-quill-new/dist/quill.snow.css";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import WarningImage from "../../assets/images/Warning.png";
+import { useFormParams } from "../../hooks/useFormParams";
 
-export const EPForm = () => {
+export const EPForm = ({ serviceType }) => {
   const { selectedEproceeding, setSelectedEproceeding } =
     useContext(AppContext);
 
@@ -37,11 +38,22 @@ export const EPForm = () => {
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const proceedingID = queryParams.get("proccedingID");
+  const formType = queryParams.get("formType");
 
-  const decodedProceedingID = proceedingID
-    ? decodeURIComponent(proceedingID)
-    : null;
+  const {
+    decodedID,
+    formParams,
+    fetchData,
+    saveData,
+    decodedKey,
+    FormTitle,
+    FormEndpoint,
+    initialFormData,
+    FormBlueprint,
+  } = useFormParams(serviceType, formType);
+
+  console.log("DECODED Key", FormBlueprint);
+  const decodedDynamicFormID = decodedID ? decodeURIComponent(decodedID) : null;
 
   const { Text } = Typography;
 
@@ -56,32 +68,7 @@ export const EPForm = () => {
     "Aadhaar",
     "Other",
   ];
-  const [formData, setFormData] = useState({
-    id: "Adjustment u/s 143(1)(a)-00030",
-    client: "IN-TAX-CLT-00029",
-    proceeding_name: "Adjustment u/s 143(1)(a)",
-    assessment_year: "2019-20",
-    financial_year: "",
-    proceeding_status: "Active",
-    notice_din: "CPC/1920/G22/1967353344",
-    response_due_date: "2020-02-13",
-    notice_sent_date: "2020-01-14",
-    notice_section: "",
-    document_reference_id: "",
-    response_acknowledgement: "",
-    notice_letter:
-      "http://34.132.54.218/private/files/19205016735-AADxxxxx9K-G22.pdf",
-    user_input: "",
-    mask_this_data: "",
-    response_message: "",
-    is_terms_and_conditions_checked: 0,
-    owner: "Administrator",
-    modified_by: "Administrator",
-    creation: "2025-03-03 17:06:03.290923",
-    modified: "2025-03-03 17:06:03.483517",
-    replies: [],
-    other_documents: [],
-  });
+  const [formData, setFormData] = useState(initialFormData);
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -114,27 +101,21 @@ export const EPForm = () => {
       }
     });
 
-    setIsFormChanged(Object.keys(changedFields).length > 0);
+    setIsFormChanged(Object.keys(changedFields)?.length > 0);
   };
 
   const handleFileChange = (e) => {
     setFormData({ ...formData, file: e.target.files[0] });
   };
 
-  const data = [
-    { file_name: "file_name 1", file: "file", id: "ID" },
-    { file_name: "file_name 2", file: "file", id: "ID" },
-    { file_name: "file_name 3", file: "file", id: "ID" },
-  ];
-
   const columns = [
     { label: "File Name", key: "file_name" },
     { label: "File", key: "file" },
   ];
 
-  const getEproceedingDetails = async (selectedProceeding) => {
-    const data = await postData("fin_buddy.api.e_proceeding_details", {
-      id: selectedProceeding,
+  const getFormDetails = async (selectedID) => {
+    const data = await postData(`${FormEndpoint}`, {
+      id: selectedID,
     });
     setFormData(data?.result);
     setOriginalData(data?.result || {});
@@ -202,13 +183,13 @@ export const EPForm = () => {
     }
   };
 
-  const saveChanges = async (decodedProceedingID) => {
+  const saveChanges = async (decodedDynamicFormID) => {
     try {
       setLoading(true);
 
       const data = await postData("fin_buddy.api.save_document", {
         doctype: "E Proceeding",
-        docname: decodedProceedingID,
+        docname: decodedDynamicFormID,
         document_data: changedFields,
       });
 
@@ -246,18 +227,18 @@ export const EPForm = () => {
   };
 
   useEffect(() => {
-    if (decodedProceedingID) {
-      getEproceedingDetails(decodedProceedingID);
+    if (decodedDynamicFormID) {
+      getFormDetails(decodedDynamicFormID);
     }
     return () => {
       setSelectedEproceeding(null);
     };
-  }, [decodedProceedingID]);
+  }, [decodedDynamicFormID]);
 
   useEffect(() => {
     if (isFormChanged) {
       setTimeout(() => {
-        saveChanges(decodedProceedingID);
+        saveChanges(decodedDynamicFormID);
       }, 2000);
     }
   }, [isFormChanged]);
@@ -270,7 +251,7 @@ export const EPForm = () => {
           <div className="flex justify-between w-full">
             <div className="flex gap-4 ">
               <h2 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
-                Tax Notice Form
+                {FormTitle}
               </h2>
               {isFormChanged && (
                 <Tag color="red" style={{ height: "20px", marginTop: "5px" }}>
@@ -283,7 +264,7 @@ export const EPForm = () => {
               disabled={!isFormChanged || loading}
               type="primary"
               className="min-w-[100px]"
-              onClick={() => saveChanges(decodedProceedingID)}
+              onClick={() => saveChanges(decodedDynamicFormID)}
             >
               {loading ? <LoadingOutlined spin /> : "Save"}
             </Button> */}
@@ -296,71 +277,26 @@ export const EPForm = () => {
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Notice Details
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Proceeding Name
-                </label>
-                <input
-                  type="text"
-                  name="proceeding_name"
-                  readOnly={true}
-                  value={formData.proceeding_name}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
+
+            {FormBlueprint != null && FormBlueprint?.section1?.length > 0 && (
+              <div className="grid grid-cols-2 gap-4">
+                {FormBlueprint?.section1?.map((item) => (
+                  <div>
+                    <label className="block text-gray-700 font-medium">
+                      {item?.label}
+                    </label>
+                    <input
+                      type="text"
+                      name={item?.name}
+                      readOnly={true}
+                      value={formData[item?.name]}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </div>
+                ))}
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Assessment Year
-                </label>
-                <input
-                  type="text"
-                  name="financial_year"
-                  readOnly={true}
-                  value={formData.financial_year}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Financial Year
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  name="documentReference"
-                  value={formData.documentReference}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Client
-                </label>
-                <input
-                  name="client"
-                  readOnly={true}
-                  value={formData.client}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Proceeding Status
-                </label>
-                <input
-                  readOnly
-                  name="proceeding_status"
-                  value={formData.proceeding_status}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Group 2 - Taxpayer Information */}
@@ -368,136 +304,101 @@ export const EPForm = () => {
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Notice Details
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Notice/ Communication Reference ID
-                </label>
-                <input
-                  type="text"
-                  name="notice_din"
-                  readOnly={true}
-                  value={formData.notice_din}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
+            {FormBlueprint != null && FormBlueprint?.section2?.length > 0 && (
+              <div className="grid grid-cols-2 gap-4">
+                {FormBlueprint?.section2?.map((item) => (
+                  <div>
+                    <label className="block text-gray-700 font-medium">
+                      {item?.label}
+                    </label>
+                    <input
+                      type="text"
+                      name={item?.name}
+                      readOnly={true}
+                      value={formData[item?.name]}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </div>
+                ))}
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Notice Section
-                </label>
-                <input
-                  type="text"
-                  name="notice_section"
-                  readOnly={true}
-                  value={formData.notice_section}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Document reference ID
-                </label>
-                <input
-                  type="text"
-                  readOnly
-                  name="document_reference_id"
-                  value={formData.document_reference_id}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
+            )}
+          </div>
+
+          {/* Group 3 */}
+          {FormBlueprint != null && FormBlueprint?.section3?.length > 0 && (
+            <div className="mb-6 border-b border-gray-300 pb-6">
+              <div className="grid grid-cols-2 gap-4">
+                {FormBlueprint?.section3?.map((item) => (
+                  <div>
+                    <label className="block text-gray-700 font-medium">
+                      {item?.label}
+                    </label>
+                    <input
+                      type="text"
+                      name={item?.name}
+                      readOnly={true}
+                      value={formData[item?.name]}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-          <div className="mb-6 border-b border-gray-300 pb-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Response Due Date
-                </label>
-                <input
-                  // type="date"
-                  readOnly
-                  name="response_due_date"
-                  value={formData.response_due_date}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Notice Sent Date
-                </label>
-                <input
-                  readOnly
-                  // type="date"
-                  name="notice_sent_date"
-                  value={formData.notice_sent_date}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-              </div>
-            </div>
-          </div>
-          {/* Group 3 - Document Information */}
+          )}
+
+          {/* Group 4 - Document Information */}
           <div className="mb-6 border-b border-gray-300 pb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               Documents{" "}
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="flex justify-between items-center">
-                  <label className="block text-gray-700 font-medium">
-                    Notice/ Communication Reference ID
-                  </label>
-                  <a
-                    href={formData.notice_letter || ""}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-md"
-                  >
-                    View
-                  </a>
-                </div>
-                <input
-                  type="text"
-                  name="notice_din"
-                  value={formData.notice_din}
-                  disabled
-                  className="w-full p-2 border rounded-md bg-gray-100"
-                />
-              </div>
-
-              <div>
-                {/* <label className="block text-gray-700 font-medium">
-                  Upload Document
-                </label>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className="w-full p-2 border rounded-md cursor-pointer"
-                />
-                {formData.file && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Selected File: {formData.file.name}
-                  </p>
-                )} */}
-              </div>
+              {FormBlueprint != null &&
+                FormBlueprint?.section4?.length > 0 &&
+                FormBlueprint?.section4?.map((item) => (
+                  <div>
+                    <div className="flex justify-between items-center">
+                      <label className="block text-gray-700 font-medium">
+                        {item?.label}
+                      </label>
+                      <a
+                        href={formData.notice_letter || ""}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-md"
+                      >
+                        View
+                      </a>
+                    </div>
+                    <input
+                      type="text"
+                      name={item?.name}
+                      readOnly={true}
+                      value={formData[item?.name]}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </div>
+                ))}
             </div>
           </div>
-          <div className="mb-6 border-b border-gray-300 pb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Previous Replies{" "}
-            </h3>
-            <Table
-              columns={columns}
-              data={formData?.replies}
-              type="replies"
-              itemsPerPage={10}
-              isPagination={0}
-            />
-          </div>
+
+          {FormBlueprint != null && FormBlueprint?.section5?.length > 0 && (
+            <div className="mb-6 border-b border-gray-300 pb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {FormBlueprint?.section5?.[0]?.sectionHeader}
+              </h3>
+              <Table
+                columns={columns}
+                data={formData?.replies || []}
+                type="replies"
+                itemsPerPage={10}
+                isPagination={0}
+              />
+            </div>
+          )}
+
           <div className="mb-6 border-b border-gray-300 pb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               User Input{" "}
@@ -519,7 +420,7 @@ export const EPForm = () => {
               </label>
               <Table
                 columns={columns}
-                data={formData?.other_documents}
+                data={formData?.other_documents || []}
                 type="documents"
                 itemsPerPage={10}
                 isPagination={0}
@@ -581,7 +482,7 @@ export const EPForm = () => {
                 type="primary"
                 className="mt-4 mb-4"
                 onClick={() => {
-                  getViewResponseData(decodedProceedingID);
+                  getViewResponseData(decodedDynamicFormID);
                   setShowMaskedData(true);
                 }}
               >
@@ -775,7 +676,7 @@ export const EPForm = () => {
           <Button
             type="primary"
             disabled={!accepted || actualResponseLoading}
-            onClick={() => genrateActualResponse(decodedProceedingID)}
+            onClick={() => genrateActualResponse(decodedDynamicFormID)}
             className="min-w-[100px]"
           >
             {actualResponseLoading ? <LoadingOutlined spin /> : "Generate "}

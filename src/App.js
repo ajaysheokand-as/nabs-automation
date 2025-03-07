@@ -17,6 +17,7 @@ import Error404 from "./pages/Error404";
 import { ServiceType } from "./utils/enums";
 import { GSTNoticeDetails } from "./pages/gst/GSTNoticeDetails";
 import { ResponseOutstandings } from "./pages/income-tax/RODemands";
+import { GSTNoticeList } from "./pages/gst/GstNoticesList";
 
 function App() {
   return (
@@ -33,9 +34,13 @@ function App() {
             path="notices"
             element={<Notice serviceType={ServiceType.GSTIN} />}
           />
-          <Route
+          {/* <Route
             path="notices/:noticeId"
             element={<GSTNoticeDetails serviceType={ServiceType.GSTIN} />}
+          /> */}
+          <Route
+            path="notices/:noticeId"
+            element={<GSTNoticeList serviceType={ServiceType.GSTIN} />}
           />
           <Route
             path="clients"
@@ -55,6 +60,10 @@ function App() {
           />
           <Route
             path="eproceeding-details"
+            element={<EPForm serviceType={ServiceType.GSTIN} />}
+          />
+          <Route
+            path="notice-details"
             element={<EPForm serviceType={ServiceType.GSTIN} />}
           />
         </Route>
@@ -92,6 +101,10 @@ function App() {
             element={
               <ResponseOutstandings serviceType={ServiceType.INCOME_TAX} />
             }
+          />
+          <Route
+            path="responseoutstandings-details"
+            element={<EPForm serviceType={ServiceType.INCOME_TAX} />}
           />
         </Route>
 
