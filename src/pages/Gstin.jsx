@@ -94,7 +94,7 @@ export const Gstin = () => {
               <option value="due">Due Notices</option>
             </select>
           </div>
-          <div className="flex flex-wrap gap-2 mb-6 mt-6 ">
+          {/* <div className="flex flex-wrap gap-2 mb-6 mt-6 ">
             <button className="px-4 py-2 border border-blue-500 bg-blue-900 text-[#fff] rounded-lg hover:bg-blue-800 hover:text-white transition cursor-pointer">
               Add Company
             </button>
@@ -107,7 +107,7 @@ export const Gstin = () => {
             <button className="px-4 py-2 border border-blue-500 bg-blue-900 text-[#fff] rounded-lg hover:bg-blue-800  hover:text-white transition cursor-pointer">
               Sync All
             </button>
-          </div>
+          </div> */}
 
           {/* Cards Section */}
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-[20px]">

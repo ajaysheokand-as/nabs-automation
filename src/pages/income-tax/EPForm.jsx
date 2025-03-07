@@ -43,6 +43,7 @@ export const EPForm = () => {
   const { Text } = Typography;
 
   const fields = [
+    "Notice ID",
     "Name",
     "Email",
     "Phone",
@@ -316,7 +317,7 @@ export const EPForm = () => {
                 <input
                   type="text"
                   name="proceeding_name"
-                  // readOnly={true}
+                  readOnly={true}
                   value={formData.proceeding_name}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
@@ -329,7 +330,7 @@ export const EPForm = () => {
                 <input
                   type="text"
                   name="financial_year"
-                  // readOnly={true}
+                  readOnly={true}
                   value={formData.financial_year}
                   onChange={handleChange}
                   className="w-full p-2 border rounded-md"
@@ -365,6 +366,7 @@ export const EPForm = () => {
                   Proceeding Status
                 </label>
                 <input
+                  readOnly
                   name="proceeding_status"
                   value={formData.proceeding_status}
                   onChange={handleChange}
@@ -481,7 +483,7 @@ export const EPForm = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 font-medium">
+                {/* <label className="block text-gray-700 font-medium">
                   Upload Document
                 </label>
                 <input
@@ -493,7 +495,7 @@ export const EPForm = () => {
                   <p className="mt-2 text-sm text-gray-600">
                     Selected File: {formData.file.name}
                   </p>
-                )}
+                )} */}
               </div>
             </div>
           </div>
@@ -526,7 +528,7 @@ export const EPForm = () => {
 
             <div>
               <label className="block text-gray-700 font-medium">
-                Other Document
+                Attach Document
               </label>
               <Table
                 columns={columns}
@@ -535,6 +537,19 @@ export const EPForm = () => {
                 itemsPerPage={10}
                 isPagination={0}
               />
+              <label className="block text-gray-700 font-medium mt-4">
+                Upload Document
+              </label>
+              <input
+                type="file"
+                onChange={handleFileChange}
+                className=" p-2 border rounded-md cursor-pointer"
+              />
+              {formData.file && (
+                <p className="mt-2 text-sm text-gray-600">
+                  Selected File: {formData.file.name}
+                </p>
+              )}
             </div>
           </div>
           <div>
@@ -613,7 +628,7 @@ export const EPForm = () => {
               </Checkbox>
             </p>
 
-            {sendResponse && (
+            {
               <Button
                 variant="filled"
                 type="primary"
@@ -627,28 +642,30 @@ export const EPForm = () => {
                   "Generate Response"
                 )}
               </Button>
-            )}
+            }
           </div>
-          <div className="mb-6  pb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Response Message
-            </h3>
-            <div>
-              <ReactQuill
-                theme="snow"
-                value={formData.response_message}
-                onChange={(value) =>
-                  handleChange({
-                    target: {
-                      name: "response_message",
-                      value: value,
-                    },
-                  })
-                }
-                className="bg-white w-full p-2 border rounded-md"
-              />
+          {formData.response_message && (
+            <div className="mb-6  pb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Response Message
+              </h3>
+              <div>
+                <ReactQuill
+                  theme="snow"
+                  value={formData.response_message}
+                  onChange={(value) =>
+                    handleChange({
+                      target: {
+                        name: "response_message",
+                        value: value,
+                      },
+                    })
+                  }
+                  className="bg-white w-full p-2 border rounded-md"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {viewResponse && (
             <Button
