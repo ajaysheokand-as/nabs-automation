@@ -73,6 +73,21 @@ export function useFormParams(serviceType, formType) {
     }
   };
 
+  const getFormType = (key) => {
+    switch (key) {
+      case "proceedingID":
+        return "E Proceeding";
+      case "responseID":
+        return "Response to Outstanding Demand";
+      case "noticeID":
+        return "GST Notice And Order";
+      case "additionalNoticeID":
+        return "GST Additional Notice";
+      default:
+        return "";
+    }
+  };
+
   const getFormDataLabelsBlueprint = (key) => {
     switch (key) {
       case "proceedingID":
@@ -166,6 +181,7 @@ export function useFormParams(serviceType, formType) {
   const FormEndpoint = getFormApiEndpoint(decodedKey);
   const initialFormData = getInitialFormData(decodedKey);
   const FormBlueprint = getFormDataLabelsBlueprint(decodedKey);
+  const FormType = getFormType(decodedKey);
 
   const fetchData = async (id) => {
     try {
@@ -197,5 +213,6 @@ export function useFormParams(serviceType, formType) {
     fetchData,
     saveData,
     FormBlueprint,
+    FormType,
   };
 }
