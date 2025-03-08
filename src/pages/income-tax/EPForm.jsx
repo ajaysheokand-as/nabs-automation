@@ -50,6 +50,7 @@ export const EPForm = ({ serviceType }) => {
     FormEndpoint,
     initialFormData,
     FormBlueprint,
+    FormType,
   } = useFormParams(serviceType, formType);
 
   console.log("DECODED Key", FormBlueprint);
@@ -128,7 +129,7 @@ export const EPForm = ({ serviceType }) => {
       const data = await postData(
         "fin_buddy.events.incometax_gov.fetch_response_from_gpt",
         {
-          doctype: "E Proceeding",
+          doctype: FormType,
           docname: selectedProceeding,
           is_view_data_before_response_generation: "true",
         }
@@ -153,7 +154,7 @@ export const EPForm = ({ serviceType }) => {
       const data = await postData(
         "fin_buddy.events.incometax_gov.fetch_response_from_gpt",
         {
-          doctype: "E Proceeding",
+          doctype: FormType,
           docname: selectedProceeding,
         }
       );
@@ -188,7 +189,7 @@ export const EPForm = ({ serviceType }) => {
       setLoading(true);
 
       const data = await postData("fin_buddy.api.save_document", {
-        doctype: "E Proceeding",
+        doctype: FormType,
         docname: decodedDynamicFormID,
         document_data: changedFields,
       });
