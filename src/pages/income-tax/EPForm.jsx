@@ -402,7 +402,7 @@ export const EPForm = ({ serviceType }) => {
 
           <div className="mb-6 border-b border-gray-300 pb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              User Input{" "}
+              User input for response generation
             </h3>
             <div>
               {/* <label className="block text-gray-700 font-medium">User Input</label> */}
@@ -417,7 +417,7 @@ export const EPForm = ({ serviceType }) => {
 
             <div>
               <label className="block text-gray-700 font-medium">
-                Attach Document
+                Attachments for response generation
               </label>
               <Table
                 columns={columns}
@@ -493,13 +493,13 @@ export const EPForm = ({ serviceType }) => {
 
             {showMaskedData && (
               <>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {/* <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Masked Data
-                </h3>
-                <div className="max-h-[50vh] overflow-auto  bg-gray-200 rounded-lg p-4 w-full">
+                </h3> */}
+                <div className="max-h-[50vh] overflow-auto  bg-gray-200 rounded-lg p-4 w-full mt-2">
                   <pre>
                     {viewResponseLoading ? (
-                      <div className="w-full  flex justify-center items-center h-[40vh]">
+                      <div className="w-full flex justify-center items-center h-[40vh]">
                         <LoadingOutlined spin style={{ fontSize: "30px" }} />
                       </div>
                     ) : (
