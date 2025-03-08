@@ -1,9 +1,11 @@
 import { useLocation } from "react-router-dom";
 import { postData } from "../api/apiService";
 import {
+  AdditionalGSTNoticeBluePrint,
   EproceedingsFormBlueprint,
   NoticeFormBlueprint,
   ResponseOutstandingFormBlueprint,
+  TDSNoticeFormBlueprint,
 } from "../utils/constants";
 
 export function useFormParams(serviceType, formType) {
@@ -29,7 +31,12 @@ export function useFormParams(serviceType, formType) {
           value: queryParams.get("additionalNoticeID"),
         },
       },
-      tds: {},
+      tds: {
+        tdsNotices: {
+          key: "tdsNoticeID",
+          value: queryParams.get("tdsNoticeID"),
+        },
+      },
     };
 
     return params[type]?.[variant] || null;
@@ -53,6 +60,8 @@ export function useFormParams(serviceType, formType) {
         return "Tax Notice Form [ Notices ] ";
       case "additionalNoticeID":
         return "Tax Notice Form [ Additional Notices ] ";
+      case "tdsNoticeID":
+        return "Tax Notice Form [ TDS Notices ]";
       default:
         return "Tax Notice Form";
     }
@@ -68,6 +77,8 @@ export function useFormParams(serviceType, formType) {
         return "fin_buddy.api.gst_notice_details";
       case "additionalNoticeID":
         return "fin_buddy.api.gst_additional_notice_details";
+      case "tdsNoticeID":
+        return "fin_buddy.api.tds_notice_details";
       default:
         return "";
     }
@@ -82,7 +93,9 @@ export function useFormParams(serviceType, formType) {
       case "noticeID":
         return "GST Notice And Order";
       case "additionalNoticeID":
-        return "GST Additional Notice";
+        return "GST Additional Notice And Order";
+      case "tdsNoticeID":
+        return "TDS Notice";
       default:
         return "";
     }
@@ -97,7 +110,9 @@ export function useFormParams(serviceType, formType) {
       case "noticeID":
         return NoticeFormBlueprint;
       case "additionalNoticeID":
-        return null;
+        return AdditionalGSTNoticeBluePrint;
+      case "tdsNoticeID":
+        return TDSNoticeFormBlueprint;
       default:
         return null;
     }
@@ -172,7 +187,37 @@ export function useFormParams(serviceType, formType) {
           modified: "2025-03-05 20:54:24.409005",
         };
       case "additionalNoticeID":
-        return {};
+        return {
+          id: "picka0k61f",
+          client: "GST-CLT-00032",
+          ref_id: "46567890GHHJ76788997",
+          type_of_notice: "NoticeSec76",
+          date_of_issuance: "2025-03-19",
+          description: "Office",
+          case_details: "rnhhpcc199",
+          owner: "Administrator",
+          modified_by: "Administrator",
+          creation: "2025-03-08 16:18:16.055987",
+          modified: "2025-03-08 16:18:34.571229",
+        };
+      case "tdsNoticeID":
+        return {
+          id: "TDS-00279",
+          client: "TDS-CLT-00059",
+          owner: "Administrator",
+          modified_by: "Administrator",
+          creation: "2025-03-05 21:08:55.834162",
+          modified: "2025-03-08 16:18:59.855603",
+          notices: [
+            {
+              id: "8v78pfrel2",
+              financial_year: "2023-24",
+              manual_demand: 0.0,
+              processed_demand: 64560.0,
+              tds_summary_details: "TDS-SMRY-00284",
+            },
+          ],
+        };
       default:
         return {};
     }
@@ -183,26 +228,6 @@ export function useFormParams(serviceType, formType) {
   const FormBlueprint = getFormDataLabelsBlueprint(decodedKey);
   const FormType = getFormType(decodedKey);
 
-  const fetchData = async (id) => {
-    try {
-      const data = await postData("fetch_endpoint", { id });
-      return data;
-    } catch (error) {
-      console.error("Error fetching data", error);
-      return null;
-    }
-  };
-
-  const saveData = async (id, formData) => {
-    try {
-      await postData("save_endpoint", { id, formData });
-      return true;
-    } catch (error) {
-      console.error("Error saving data", error);
-      return false;
-    }
-  };
-
   return {
     decodedID,
     decodedKey,
@@ -210,8 +235,7 @@ export function useFormParams(serviceType, formType) {
     FormTitle,
     FormEndpoint,
     initialFormData,
-    fetchData,
-    saveData,
+
     FormBlueprint,
     FormType,
   };

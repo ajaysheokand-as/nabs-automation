@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MainLayout } from "../layouts/MainLayout";
 import { InfoCard } from "../components/InfoCard";
 import { NoticeSummery } from "../components/NoticeSummery";
@@ -13,23 +13,21 @@ import {
   FaUserLock,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useAxiosPost } from "../hooks/useAxios";
 
 export const Tds = () => {
   const navigate = useNavigate();
-  const data = [
-    { title: "Company 1", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 2", count: 0, icon: <FaRegCalendar /> },
-    { title: "Company 3", count: 0, icon: <FaRegClock /> },
-    { title: "Company 4", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 5", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 6", count: 0, icon: <FaFileAlt /> },
-  ];
+  const [cardsData, setCardsData] = useState({});
+  const [fetchTDSCards] = useAxiosPost("fin_buddy.api.get_tds_cards");
 
-  const columns = [
-    { label: "Title", key: "title" },
-    { label: "Count", key: "count" },
-    { label: "Icon", key: "icon" },
-  ];
+  useEffect(() => {
+    fetchTDSCards({
+      cb: (data) => {
+        setCardsData(data?.result || {});
+      },
+    });
+  }, []);
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header Dropdown */}
@@ -48,25 +46,33 @@ export const Tds = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <InfoCard
             title="Total Notices"
-            count="0"
+            count={cardsData?.total_notices || 0}
             icon={<FaFileAlt />}
             onClick={() => navigate("notice")}
           />
           <InfoCard title="Open Notices" count="0" icon={<FaFileAlt />} />
           <InfoCard
             title="Total Clients"
-            count="3"
+            count={cardsData?.total_clients || 0}
             onClick={() => navigate("clients")}
             icon={<FaIdCard />}
           />
-          <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
+          <InfoCard
+            title="Last 24 Hours"
+            count={cardsData?.last_24_hours || 0}
+            icon={<FaRegClock />}
+          />
           <InfoCard
             title="Due within 7 Days"
             count="0"
             icon={<FaExclamationCircle />}
           />
           <InfoCard title="Failed Logins" count="0" icon={<FaUserLock />} />
-          <InfoCard title="Last 15 Days" count="0" icon={<FaRegCalendar />} />
+          <InfoCard
+            title="Last 15 Days"
+            count={cardsData?.last_15_days || 0}
+            icon={<FaRegCalendar />}
+          />
           {/* <InfoCard title="Total GSTIN" count="0" icon={<FaFileAlt />} /> */}
 
           <InfoCard title="Over Due" count="0" icon={<FaFileAlt />} />

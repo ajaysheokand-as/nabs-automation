@@ -45,8 +45,16 @@ export const Table = ({
         navigate(
           `${rowRedirection}?responseID=${data?.id}&formType=responseOutstandings`
         );
-      } else if (type == "notices") {
+      } else if (type == "notices" && serviceType == "gstin") {
         navigate(`${rowRedirection}?noticeID=${data?.id}&formType=notices`);
+      } else if (type == "notices" && serviceType == "tds") {
+        navigate(
+          `${rowRedirection}?tdsNoticeID=${data?.id}&formType=tdsNotices`
+        );
+      } else if (type == "additional-notices") {
+        navigate(
+          `${rowRedirection}?additionalNoticeID=${data?.id}&formType=additionalNotices`
+        );
       } else {
         navigate(rowRedirection);
       }

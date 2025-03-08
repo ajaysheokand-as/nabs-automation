@@ -176,6 +176,35 @@ export const NoticeFormBlueprint = {
   section5: [],
 };
 
+export const TDSNoticeFormBlueprint = {
+  section1: [
+    { label: "Client", name: "client" },
+    { label: "ID", name: "id" },
+    { label: "Owner", name: "owner" },
+  ],
+  section2: [],
+  section3: [],
+  section4: [{ label: "Notice ID", name: "id" }],
+  section5: [{ label: "Notices", name: "notices" }],
+};
+
+export const AdditionalGSTNoticeBluePrint = {
+  section1: [
+    { label: "Client", name: "client" },
+    { label: "ID", name: "id" },
+    { label: "Ref ID", name: "ref_id" },
+    { label: "Description", name: "description" },
+    { label: "Case Details", name: "case_details" },
+  ],
+  section2: [
+    { label: "Ref ID", name: "ref_id" },
+    { label: "Notice Type", name: "type_of_notice" },
+  ],
+  section3: [{ label: "Issued Date", name: "date_of_issuance" }],
+  section4: [{ label: "Notice ID", name: "id" }],
+  section5: [{ label: "Notices", name: "notices" }],
+};
+
 export const EproceedingsFormBlueprint = {
   section1: [
     { label: "Proceeding Name", name: "client" },

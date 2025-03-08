@@ -6,30 +6,26 @@ import { useParams } from "react-router-dom";
 import { ServiceType } from "../../utils/enums";
 import { Table } from "../../components/Table";
 
-export const GSTNoticeList = ({ serviceType }) => {
+export const TDSNoticeList = ({ serviceType }) => {
   const { clientId } = useParams();
   const [notices, setNotices] = useState([]);
 
   const columns = [
-    { label: "Notice ID", key: "notice_id" },
-    { label: "Issued By", key: "issued_by" },
-    { label: "Type", key: "type" },
-    { label: "Issue Date", key: "issue_date" },
-    { label: "Due Date", key: "due_date" },
-    { label: "Amount", key: "amount" },
-    { label: "File", key: "file" },
+    { label: "Notice ID", key: "id" },
+    { label: "Client", key: "client" },
+    { label: "Owner", key: "owner" },
   ];
 
-  const [fetchGSTNoticeList, { loading: loadingNotice }] = useAxiosPost(
-    "fin_buddy.api.gst_notice_list"
+  const [fetchTDSNoticeDetails, { loading: loadingNotice }] = useAxiosPost(
+    "fin_buddy.api.tds_notice_list"
   );
 
   useEffect(() => {
-    fetchGSTNoticeList({
+    fetchTDSNoticeDetails({
       payload: {
         start: 0,
         page_length: 20,
-        search_query: ` ${clientId ? clientId : ""}`,
+        search_query: `${clientId ? clientId : ""}`,
       },
       cb: (data) => {
         setNotices(data?.result?.records || []);
@@ -39,14 +35,14 @@ export const GSTNoticeList = ({ serviceType }) => {
 
   return (
     <>
-      <PageTitle title="GST Notice List" />
+      <PageTitle title="TDS Notice Details" />
       <Table
         columns={columns}
         data={notices}
         itemsPerPage={10}
         type="notices"
         serviceType={serviceType}
-        rowRedirection={`/${ServiceType.GSTIN}/notice-details`}
+        rowRedirection={`/${ServiceType.TDS}/notice-details`}
       />
     </>
   );

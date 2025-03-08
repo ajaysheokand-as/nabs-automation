@@ -18,6 +18,8 @@ import { ServiceType } from "./utils/enums";
 import { GSTNoticeDetails } from "./pages/gst/GSTNoticeDetails";
 import { ResponseOutstandings } from "./pages/income-tax/RODemands";
 import { GSTNoticeList } from "./pages/gst/GstNoticesList";
+import { TDSNoticeList } from "./pages/tds/TDSNoticesList";
+import { GSTAdditionalNoticesList } from "./pages/gst/GSTAdditionalNoticesList";
 
 function App() {
   return (
@@ -30,18 +32,7 @@ function App() {
 
         <Route path={`/${ServiceType.GSTIN}`} element={<GSTLayout />}>
           <Route index element={<Gstin serviceType={ServiceType.GSTIN} />} />
-          <Route
-            path="notices"
-            element={<Notice serviceType={ServiceType.GSTIN} />}
-          />
-          {/* <Route
-            path="notices/:noticeId"
-            element={<GSTNoticeDetails serviceType={ServiceType.GSTIN} />}
-          /> */}
-          <Route
-            path="notices/:noticeId"
-            element={<GSTNoticeList serviceType={ServiceType.GSTIN} />}
-          />
+
           <Route
             path="clients"
             element={<Clients serviceType={ServiceType.GSTIN} />}
@@ -61,6 +52,20 @@ function App() {
           <Route
             path="eproceeding-details"
             element={<EPForm serviceType={ServiceType.GSTIN} />}
+          />
+          <Route
+            path="notices"
+            element={<GSTNoticeList serviceType={ServiceType.GSTIN} />}
+          />
+          <Route
+            path="notices/:clientId"
+            element={<GSTNoticeList serviceType={ServiceType.GSTIN} />}
+          />
+          <Route
+            path="additional-notices/:clientId"
+            element={
+              <GSTAdditionalNoticesList serviceType={ServiceType.GSTIN} />
+            }
           />
           <Route
             path="notice-details"
@@ -102,6 +107,7 @@ function App() {
               <ResponseOutstandings serviceType={ServiceType.INCOME_TAX} />
             }
           />
+
           <Route
             path="responseoutstandings-details"
             element={<EPForm serviceType={ServiceType.INCOME_TAX} />}
@@ -110,16 +116,16 @@ function App() {
 
         <Route path={`/${ServiceType.TDS}`} element={<TDSLayout />}>
           <Route index element={<Tds serviceType={ServiceType.TDS} />} />
-          <Route
+          {/* <Route
             path="notice"
             element={<Notice serviceType={ServiceType.TDS} />}
-          />
+          /> */}
           <Route
             path="clients"
             element={<Clients serviceType={ServiceType.TDS} />}
           />
           <Route
-            path="client-view/:cliendId"
+            path="client-view/:clientId"
             element={<ClientView serviceType={ServiceType.TDS} />}
           />
           <Route
@@ -128,6 +134,19 @@ function App() {
           />
           <Route
             path="eproceeding-details"
+            element={<EPForm serviceType={ServiceType.TDS} />}
+          />
+          <Route
+            path="notice"
+            element={<TDSNoticeList serviceType={ServiceType.TDS} />}
+          />
+
+          <Route
+            path="notices/:clientId"
+            element={<TDSNoticeList serviceType={ServiceType.TDS} />}
+          />
+          <Route
+            path="notice-details"
             element={<EPForm serviceType={ServiceType.TDS} />}
           />
         </Route>
