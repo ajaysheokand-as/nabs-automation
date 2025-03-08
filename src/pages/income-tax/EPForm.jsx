@@ -273,10 +273,10 @@ export const EPForm = ({ serviceType }) => {
 
           <Divider style={{ margin: 0, borderWidth: "0.8px" }} />
 
-          {/* Group 1 - Notice Details */}
+          {/* Group 1 - Client Details */}
           <div className="mb-6 border-b border-gray-300 pb-6 mt-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Notice Details
+              Client Details
             </h3>
 
             {FormBlueprint != null && FormBlueprint?.section1?.length > 0 && (
