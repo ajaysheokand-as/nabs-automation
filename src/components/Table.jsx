@@ -31,6 +31,8 @@ export const Table = ({
     if (rowRedirection && typeof rowRedirection === "function") {
       if (serviceType == "income-tax" && type == "clients") {
         navigate(`/${serviceType}/client-view/${data.id}`);
+      } else if (serviceType == "tds" && type == "clients") {
+        navigate(`/${serviceType}/client-view/${data.id}`);
       } else {
         navigate(rowRedirection(data));
       }
