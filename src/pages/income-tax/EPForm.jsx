@@ -53,7 +53,6 @@ export const EPForm = ({ serviceType }) => {
     FormType,
   } = useFormParams(serviceType, formType);
 
-  console.log("DECODED Key", FormBlueprint);
   const decodedDynamicFormID = decodedID ? decodeURIComponent(decodedID) : null;
 
   const { Text } = Typography;
@@ -112,6 +111,14 @@ export const EPForm = ({ serviceType }) => {
   const columns = [
     { label: "File Name", key: "file_name" },
     { label: "File", key: "file" },
+  ];
+
+  const tdsColumns = [
+    { label: "Notice ID", key: "id" },
+    { label: "Financial Year", key: "manual_demand" },
+    { label: "Manual Demand", key: "financial_year" },
+    { label: "Processed Demand", key: "processed_demand" },
+    { label: "TDS Summary Details", key: "tds_summary_details" },
   ];
 
   const getFormDetails = async (selectedID) => {
@@ -301,11 +308,13 @@ export const EPForm = ({ serviceType }) => {
           </div>
 
           {/* Group 2 - Taxpayer Information */}
-          <div className="mb-6 border-b border-gray-300 pb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Notice Details
-            </h3>
-            {FormBlueprint != null && FormBlueprint?.section2?.length > 0 && (
+
+          {FormBlueprint != null && FormBlueprint?.section2?.length > 0 && (
+            <div className="mb-6 border-b border-gray-300 pb-6">
+              {" "}
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Notice Details
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 {FormBlueprint?.section2?.map((item) => (
                   <div>
@@ -323,8 +332,8 @@ export const EPForm = ({ serviceType }) => {
                   </div>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Group 3 */}
           {FormBlueprint != null && FormBlueprint?.section3?.length > 0 && (
@@ -391,9 +400,13 @@ export const EPForm = ({ serviceType }) => {
                 {FormBlueprint?.section5?.[0]?.sectionHeader}
               </h3>
               <Table
-                columns={columns}
-                data={formData?.replies || []}
-                type="replies"
+                columns={decodedKey == "tdsNoticeID" ? tdsColumns : columns}
+                data={
+                  decodedKey == "tdsNoticeID"
+                    ? formData?.notices || []
+                    : formData?.replies || []
+                }
+                type={decodedKey == "tdsNoticeID" ? "notices" : "replies"}
                 itemsPerPage={10}
                 isPagination={0}
               />

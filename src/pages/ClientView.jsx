@@ -76,7 +76,7 @@ export const ClientView = ({ serviceType }) => {
           <div className="flex justify-between mb-6">
             <button
               onClick={() =>
-                navigate(`/${serviceType}/notices?clientId=${clientId}`)
+                navigate(`/${serviceType}/additional-notices/${clientId}`)
               }
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
@@ -84,9 +84,7 @@ export const ClientView = ({ serviceType }) => {
             </button>
 
             <button
-              onClick={() =>
-                navigate(`/${serviceType}/notices?clientId=${clientId}`)
-              }
+              onClick={() => navigate(`/${serviceType}/notices/${clientId}`)}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               GST Notice
@@ -94,18 +92,17 @@ export const ClientView = ({ serviceType }) => {
           </div>
         )}
 
-        {serviceType === ServiceType.GSTIN && (
+        {serviceType === ServiceType.TDS && (
           <div className="flex justify-between mb-6">
             <button
-              onClick={() =>
-                navigate(`/${serviceType}/notices?clientId=${clientId}`)
-              }
+              onClick={() => navigate(`/${serviceType}/notices/${clientId}`)}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               TDS Notice
             </button>
           </div>
         )}
+
         {/* Client Details */}
         <div className="border-b pb-4 mb-4">
           <h2 className="text-lg font-semibold text-gray-700 mb-2">
