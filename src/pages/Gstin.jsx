@@ -16,14 +16,9 @@ const Cards = [
     icon: FaFileAlt,
   },
   {
-    id: CardTypes.LAST_15_DAYS,
-    title: "Last 15 Days",
-    icon: FaRegCalendar,
-  },
-  {
-    id: CardTypes.LAST_24_HOURS,
-    title: "Last 24 Hours",
-    icon: FaRegClock,
+    id: CardTypes.OPEN_NOTICES,
+    title: "Open Notices",
+    icon: FaFileAlt,
   },
   {
     id: CardTypes.TOTAL_CLIENTS,
@@ -32,9 +27,24 @@ const Cards = [
     icon: FaFileAlt,
   },
   {
-    id: CardTypes.OPEN_NOTICES,
-    title: "Open Notices",
-    icon: FaFileAlt,
+    id: CardTypes.LAST_24_HOURS,
+    title: "Last 24 Hours",
+    icon: FaRegClock,
+  },
+  {
+    id: CardTypes.OVER_DUE_7_DAYS,
+    title: "Due within 7 days",
+    icon: FaRegCalendar,
+  },
+  {
+    id: CardTypes.failed_login,
+    title: "Failed Login",
+    icon: FaRegCalendar,
+  },
+  {
+    id: CardTypes.LAST_15_DAYS,
+    title: "Last 15 Days",
+    icon: FaRegCalendar,
   },
   {
     id: CardTypes.OVER_DUE,
@@ -84,7 +94,7 @@ export const Gstin = () => {
       <div className="flex flex-col gap-4 md:flex-row md:gap-4">
         <div className="w-full md:w-1/2">
           {/* Header Dropdown */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label className="block text-gray-700 font-semibold mb-1">
               Type Of Notices
             </label>
@@ -93,7 +103,7 @@ export const Gstin = () => {
               <option value="open">Open Notices</option>
               <option value="due">Due Notices</option>
             </select>
-          </div>
+          </div> */}
           {/* <div className="flex flex-wrap gap-2 mb-6 mt-6 ">
             <button className="px-4 py-2 border border-blue-500 bg-blue-900 text-[#fff] rounded-lg hover:bg-blue-800 hover:text-white transition cursor-pointer">
               Add Company
