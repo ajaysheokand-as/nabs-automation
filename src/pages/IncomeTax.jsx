@@ -33,7 +33,7 @@ export const IncomeTax = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header Dropdown */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <label className="block text-gray-700 font-semibold mb-1">
           Type Of Notices
         </label>
@@ -42,7 +42,7 @@ export const IncomeTax = () => {
           <option value="open">Open Notices</option>
           <option value="due">Due Notices</option>
         </select>
-      </div>
+      </div> */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Cards Section */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
@@ -52,26 +52,27 @@ export const IncomeTax = () => {
             onClick={() => navigate("notice")}
             icon={<FaFileAlt />}
           />
-          <InfoCard title="Last 15 Days" count="0" icon={<FaRegClock />} />
-          <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
-          <InfoCard
-            title="Total Clients"
-            count="3"
-            onClick={() => navigate("clients")}
-            icon={<FaIdCard />}
-          />
           <InfoCard
             title="Open Notices"
             count="0"
             icon={<FaExclamationTriangle />}
           />
           <InfoCard
-            title="7 Over Due"
+            title="Total Clients"
+            count="3"
+            onClick={() => navigate("clients")}
+            icon={<FaIdCard />}
+          />
+          <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
+          <InfoCard
+            title="Due within 7 Days"
             count="0"
             icon={<FaExclamationCircle />}
           />
-          <InfoCard title="Over Due" count="0" icon={<FaTimesCircle />} />
           <InfoCard title="Failed Logins" count="0" icon={<FaUserLock />} />
+          <InfoCard title="Last 15 Days" count="0" icon={<FaRegClock />} />
+
+          <InfoCard title="Over Due" count="0" icon={<FaTimesCircle />} />
         </div>
         <Calender />
       </div>

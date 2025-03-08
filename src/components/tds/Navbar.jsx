@@ -15,14 +15,14 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-4 flex justify-start items-center">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-blue-900">
           NABS Automation
         </Link>
 
         {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-6">
+        <ul className="hidden md:flex space-x-6 ml-4">
           <li>
             <Link
               to={"/"}

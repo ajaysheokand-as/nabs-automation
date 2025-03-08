@@ -74,7 +74,16 @@ export const ClientView = ({ serviceType }) => {
         )}
 
         {serviceType === ServiceType.GSTIN && (
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-between mb-6">
+            <button
+              onClick={() =>
+                navigate(`/${serviceType}/notices?clientId=${clientId}`)
+              }
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            >
+              Additional Notice
+            </button>
+
             <button
               onClick={() =>
                 navigate(`/${serviceType}/notices?clientId=${clientId}`)

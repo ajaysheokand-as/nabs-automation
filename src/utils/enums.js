@@ -12,4 +12,5 @@ export const CardTypes = {
   OPEN_NOTICES: "open_notices",
   OVER_DUE: "over_due",
   OVER_DUE_7_DAYS: "over_due_7_days",
+  FAILED_LOGIN: "failed_login",
 };
