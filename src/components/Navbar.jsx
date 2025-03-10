@@ -15,7 +15,7 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-start items-center">
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-blue-900">
           NABS Automation

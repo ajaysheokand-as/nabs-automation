@@ -27,10 +27,11 @@ export const ResponseOutstandings = ({ serviceType }) => {
   }, []);
 
   const columns = [
-    { label: "ID", key: "id" },
     { label: "Demand Reference No", key: "demand_reference_no" },
+    { label: "Section Code", key: "section_code" },
     { label: "Assessment Year", key: "assessment_year" },
-    { label: "Outstanding Demand Amount", key: "outstanding_demand_amount" },
+    { label: "Rectification Rights", key: "rectification_rights" },
+    { label: "Response Type", key: "response_type" },
   ];
 
   return (

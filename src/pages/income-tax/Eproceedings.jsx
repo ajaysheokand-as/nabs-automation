@@ -5,6 +5,7 @@ import { columns, data } from "../../utils/constants";
 import { postData } from "../../api/apiService";
 import { ServiceType } from "../../utils/enums";
 import { useParams } from "react-router-dom";
+import { Tag } from "antd";
 export const Eproceedings = () => {
   const [ePdataList, setEPDataList] = useState([]);
   const { clientId } = useParams();
@@ -24,11 +25,26 @@ export const Eproceedings = () => {
   }, []);
 
   const columns = [
-    { label: "ID", key: "id" },
+    { label: "Notice/Communication Reference ID", key: "notice_din" },
     { label: "Name", key: "proceeding_name" },
+    { label: "Financial Year", key: "financial_year" },
     { label: "Assessment Year", key: "assessment_year" },
     { label: "Notice Sent Date", key: "notice_sent_date" },
-    { label: "Staus", key: "proceeding_status" },
+    {
+      label: "Status",
+      key: "proceeding_status",
+      render: (row) => {
+        return (
+          <div className="flex items-center h-14 justify-center">
+            {row?.proceeding_status == "Active" ? (
+              <Tag color="blue">{row?.proceeding_status}</Tag>
+            ) : (
+              <Tag color="red">{row?.proceeding_status}</Tag>
+            )}
+          </div>
+        );
+      },
+    },
     { label: "Due Date", key: "response_due_date" },
   ];
 

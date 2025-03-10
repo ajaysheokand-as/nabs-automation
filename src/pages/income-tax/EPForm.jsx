@@ -7,18 +7,25 @@ import { postData } from "../../api/apiService";
 import { Button, Checkbox, Divider, Modal, Tag, Typography } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
+// import "react-quill-new/dist/quill.snow.css";
 import { LoadingOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import WarningImage from "../../assets/images/Warning.png";
 import { useFormParams } from "../../hooks/useFormParams";
+import axios from "axios";
 
 export const EPForm = ({ serviceType }) => {
   const { selectedEproceeding, setSelectedEproceeding } =
     useContext(AppContext);
 
   const [sendResponse, setSendResponse] = useState(false);
-  const [maskedFields, setMaskedFields] = useState([]);
+  const [maskedFields, setMaskedFields] = useState([
+    "pan",
+    "aadhaar_card",
+    "dates",
+    "email",
+    "phone_number",
+  ]);
   const [showMaskedData, setShowMaskedData] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
@@ -55,19 +62,16 @@ export const EPForm = ({ serviceType }) => {
 
   const decodedDynamicFormID = decodedID ? decodeURIComponent(decodedID) : null;
 
+  const [file, setFile] = useState(null);
+  const [fileFormData, setFileFormData] = useState({
+    is_private: "1",
+    doctype: FormType,
+    docname: decodedDynamicFormID,
+  });
+
   const { Text } = Typography;
 
-  const fields = [
-    "Notice ID",
-    "Name",
-    "Email",
-    "Phone",
-    "Address",
-    "Date of Birth",
-    "PAN",
-    "Aadhaar",
-    "Other",
-  ];
+  const fields = ["PAN", "Email", "Phone Number", "Aadhaar Card", "Dates"];
   const [formData, setFormData] = useState(initialFormData);
 
   const handleCheckboxChange = (event) => {
@@ -105,7 +109,7 @@ export const EPForm = ({ serviceType }) => {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, file: e.target.files[0] });
+    setFile(e.target.files[0]);
   };
 
   const columns = [
@@ -219,6 +223,48 @@ export const EPForm = ({ serviceType }) => {
       setTimeout(() => {
         setLoading(false);
       }, 1000);
+    }
+  };
+
+  const uploadFile = async () => {
+    try {
+      setLoading(true);
+
+      console.log("FILEEL", file);
+
+      const payload = new FormData();
+      payload.append("is_private", fileFormData.is_private);
+      payload.append("doctype", fileFormData.doctype);
+      payload.append("docname", fileFormData.docname);
+      payload.append("attached_to_field", file, file.name);
+
+      const token =
+        localStorage.getItem("authToken") || "9fbc6df30ef1431:6d4f68e133966b7";
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `token ${token}`,
+        },
+      };
+
+      const response = await axios.post(
+        process.env.REACT_APP_API_BASE_URL + "fin_buddy.api.upload_file",
+        payload,
+        config
+      );
+
+      toast.info("File uploaded successfully", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } catch (error) {
+      toast.error("Error uploading file", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -391,6 +437,28 @@ export const EPForm = ({ serviceType }) => {
                     />
                   </div>
                 ))}
+              <div>
+                {" "}
+                <div className="flex justify-between items-center">
+                  <label className="block text-gray-700 font-medium ">
+                    Upload Document
+                  </label>
+                  {file && (
+                    <p
+                      type="text"
+                      className="text-blue-600 hover:underline text-md cursor-pointer "
+                      onClick={uploadFile}
+                    >
+                      Upload File
+                    </p>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className=" p-2 border rounded-md cursor-pointer w-full"
+                />
+              </div>
             </div>
           </div>
 
@@ -429,7 +497,7 @@ export const EPForm = ({ serviceType }) => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium">
+              <label className="block  text-lg font-semibold mt-4 text-gray-700 font-medium">
                 Attachments for response generation
               </label>
               <Table
@@ -439,14 +507,7 @@ export const EPForm = ({ serviceType }) => {
                 itemsPerPage={10}
                 isPagination={0}
               />
-              <label className="block text-gray-700 font-medium mt-4">
-                Upload Document
-              </label>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className=" p-2 border rounded-md cursor-pointer"
-              />
+
               {formData.file && (
                 <p className="mt-2 text-sm text-gray-600">
                   Selected File: {formData.file.name}
@@ -456,8 +517,21 @@ export const EPForm = ({ serviceType }) => {
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">
-              Mask Data
+              Mask This Data
             </label>
+            <div className="mt-4 mb-4">
+              <TextArea
+                variant="filled"
+                name="mask_this_data"
+                value={formData.mask_this_data}
+                onChange={handleChange}
+                placeholder="Enter the names you want to mask in comma separated format here. (Example : name1, name2, name3)"
+                autoSize={{
+                  minRows: 6,
+                  maxRows: 8,
+                }}
+              />
+            </div>
             <div className="flex flex-wrap gap-4">
               {fields.map((item, index) => {
                 const value = item.toLowerCase().replace(/\s/g, "_");
@@ -475,21 +549,6 @@ export const EPForm = ({ serviceType }) => {
                 );
               })}
             </div>
-            {maskedFields.includes("other") && (
-              <div className="mt-4">
-                <TextArea
-                  variant="filled"
-                  name="mask_this_data"
-                  value={formData.mask_this_data}
-                  onChange={handleChange}
-                  placeholder="Enter the names you want to mask in comma separated format here. (Example : name1, name2, name3)"
-                  autoSize={{
-                    minRows: 4,
-                    maxRows: 6,
-                  }}
-                />
-              </div>
-            )}
 
             <div className="flex items-center gap-8 ">
               <Button
@@ -523,26 +582,25 @@ export const EPForm = ({ serviceType }) => {
               </>
             )}
 
-            {/* <p style={{ margin: "20px 0px" }}>
+            <p style={{ margin: "5px 0px" }}>
               <Checkbox
                 checked={sendResponse}
-                disabled={disabled}
+                // disabled={disabled}
                 onChange={onSendResponseChange}
               >
                 Send your data to AI Model for response generation?
               </Checkbox>
-            </p> */}
+            </p>
 
-            {sendResponse && (
-              <Button
-                variant="filled"
-                type="primary"
-                className="my-4 min-w-[200px]"
-                onClick={() => setOpenTandCModal(true)}
-              >
-                Generate Response
-              </Button>
-            )}
+            <Button
+              variant="filled"
+              type="primary"
+              disabled={!sendResponse}
+              className="my-4 min-w-[200px]"
+              onClick={() => setOpenTandCModal(true)}
+            >
+              Generate Response
+            </Button>
           </div>
           {formData.response_message && (
             <div className="mb-6  pb-6">

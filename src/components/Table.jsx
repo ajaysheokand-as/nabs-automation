@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppContext from "../context/AppContext";
 import { FileExclamationOutlined } from "@ant-design/icons";
+import { Spin } from "antd";
 
 export const Table = ({
   columns,
@@ -22,6 +23,14 @@ export const Table = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const contentStyle = {
+    padding: 50,
+    background: "rgba(0, 0, 0, 0.05)",
+    borderRadius: 4,
+    minHeight: "40vh",
+  };
+  const content = <div style={contentStyle} />;
 
   const handleRowClick = (data) => {
     if (type == "eproceeding") {
@@ -67,7 +76,7 @@ export const Table = ({
         <thead>
           <tr className="bg-gray-200 text-left">
             {columns.map((col, index) => (
-              <th key={index} className="p-3 border-b">
+              <th align="center" key={index} className="p-3 border-b">
                 {col.label}
               </th>
             ))}
@@ -75,21 +84,30 @@ export const Table = ({
           </tr>
         </thead>
         <tbody>
-          {paginatedData.length > 0 ? (
+          {paginatedData.length > 0 && !isLoading ? (
             paginatedData.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="border-b hover:bg-gray-100"
-                onClick={() => {
-                  handleRowClick(row);
-                }}
-              >
+              <tr key={rowIndex} className="border-b hover:bg-gray-100">
                 {columns.map((col, colIndex) => {
                   if (col.render) {
-                    return <>{col.render(row)}</>;
+                    return (
+                      <td
+                        key={colIndex}
+                        align="center"
+                        className="p-3 cursor-pointer"
+                      >
+                        <>{col.render(row)}</>
+                      </td>
+                    );
                   }
                   return (
-                    <td key={colIndex} className="p-3 cursor-pointer">
+                    <td
+                      align="center"
+                      key={colIndex}
+                      className="p-3 cursor-pointer"
+                      onClick={() => {
+                        handleRowClick(row);
+                      }}
+                    >
                       {row[col.key]}
                     </td>
                   );
@@ -122,7 +140,9 @@ export const Table = ({
                     colSpan={columns.length + 1}
                     className="p-3 text-center text-gray-500"
                   >
-                    Loading ...
+                    <Spin tip="Loading" size="large">
+                      {content}
+                    </Spin>
                   </td>
                 </tr>
               )}
