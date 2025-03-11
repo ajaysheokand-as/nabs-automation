@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAxiosPost } from "../hooks/useAxios";
 import { ServiceType } from "../utils/enums";
 import { Breadcrumb, Button, Input } from "antd";
+import { FaPlus } from "react-icons/fa";
 
 const urlMapping = {
   fetchClients: {
@@ -107,26 +108,47 @@ export const ClientView = ({ serviceType }) => {
         {/* Buttons */}
         {serviceType === ServiceType.INCOME_TAX && (
           <div className="flex justify-between mb-6">
-            <Button
-              type="primary"
-              onClick={() =>
-                navigate(`/${serviceType}/responseoutstandings/${clientId}`)
-              }
-            >
-              Response to Outstanding Demand
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={() =>
-                navigate(`/${serviceType}/eproceedings/${clientId}`)
-              }
-            >
-              E Proceeding{" "}
-              {/* <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded ml-2">
+            <div className="flex items-center gap-2">
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/${serviceType}/responseoutstandings/${clientId}`)
+                }
+              >
+                Response to Outstanding Demand
+              </Button>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(
+                    `/${serviceType}/add-responseoutstandings/${clientId}`
+                  )
+                }
+              >
+                <FaPlus />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/${serviceType}/eproceedings/${clientId}`)
+                }
+              >
+                E Proceeding{" "}
+                {/* <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded ml-2">
                 2
               </span> */}
-            </Button>
+              </Button>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/${serviceType}/add-eproceedings/${clientId}`)
+                }
+              >
+                <FaPlus />
+              </Button>
+            </div>
           </div>
         )}
 

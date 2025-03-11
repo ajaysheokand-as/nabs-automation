@@ -24,7 +24,7 @@ const columns = [
       return (
         <div className="flex items-center h-14 justify-center">
           {row?.disabled == "0" ? (
-            <Tag color="blue">Enabled</Tag>
+            <Tag color="success">Enabled</Tag>
           ) : (
             <Tag color="red">Disabled</Tag>
           )}
@@ -54,7 +54,7 @@ const columns = [
               minWidth: "200px",
               padding: "5px",
             }}
-            color="processing"
+            color="volcano"
           >
             {formattedDate}
           </Tag>

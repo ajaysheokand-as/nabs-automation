@@ -35,3 +35,16 @@
 .ant-spin-text {
   color: #2746b2 !important;
 }
+
+.ant-input {
+  padding: 10px !important;
+}
+
+.ant-picker {
+  padding: 10px !important;
+}
+
+label {
+  color: #4b5563 !important;
+  font-size: 1em !important;
+}

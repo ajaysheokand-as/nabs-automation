@@ -20,6 +20,8 @@ import { ResponseOutstandings } from "./pages/income-tax/RODemands";
 import { GSTNoticeList } from "./pages/gst/GstNoticesList";
 import { TDSNoticeList } from "./pages/tds/TDSNoticesList";
 import { GSTAdditionalNoticesList } from "./pages/gst/GSTAdditionalNoticesList";
+import AddEproceedingForm from "./components/AddEproceedingForm";
+import AddResponseOutstandingsForm from "./components/AddResponseOutstandingsForm";
 
 function App() {
   return (
@@ -98,6 +100,17 @@ function App() {
             element={<Eproceedings serviceType={ServiceType.INCOME_TAX} />}
           />
           <Route
+            path="notices"
+            element={<Eproceedings serviceType={ServiceType.INCOME_TAX} />}
+          />
+
+          <Route
+            path="add-eproceedings/:clientId"
+            element={
+              <AddEproceedingForm serviceType={ServiceType.INCOME_TAX} />
+            }
+          />
+          <Route
             path="eproceeding-details"
             element={<EPForm serviceType={ServiceType.INCOME_TAX} />}
           />
@@ -105,6 +118,15 @@ function App() {
             path="responseoutstandings/:clientId"
             element={
               <ResponseOutstandings serviceType={ServiceType.INCOME_TAX} />
+            }
+          />
+
+          <Route
+            path="add-responseoutstandings/:clientId"
+            element={
+              <AddResponseOutstandingsForm
+                serviceType={ServiceType.INCOME_TAX}
+              />
             }
           />
 
