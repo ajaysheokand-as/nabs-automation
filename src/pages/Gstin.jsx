@@ -57,11 +57,15 @@ export const Gstin = () => {
   const navigate = useNavigate();
   const [cardsData, setCardsData] = useState({});
   const [fetchGSTCards] = useAxiosPost("fin_buddy.api.get_gst_cards");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchGSTCards({
       cb: (data) => {
         setCardsData(data?.result || {});
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       },
     });
   }, []);
@@ -128,6 +132,7 @@ export const Gstin = () => {
                 <InfoCard
                   key={index}
                   title={card.title}
+                  loading={loading}
                   count={cardsData[card.id] || 0}
                   icon={<card.icon />}
                   onClick={() => {

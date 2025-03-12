@@ -13,3 +13,38 @@
 .ant-breadcrumb-separator {
   color: #1e3a8a !important;
 }
+
+.ant-btn-primary {
+  background-color: #1e3a8a !important;
+  color: #fff !important;
+  padding: 18px !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: #2746b2 !important;
+}
+
+.ant-btn-primary:disabled {
+  background-color: #a3aed0 !important;
+}
+
+.ant-spin-dot-holder {
+  color: #2746b2 !important;
+}
+
+.ant-spin-text {
+  color: #2746b2 !important;
+}
+
+.ant-input {
+  padding: 10px !important;
+}
+
+.ant-picker {
+  padding: 10px !important;
+}
+
+label {
+  color: #4b5563 !important;
+  font-size: 1em !important;
+}

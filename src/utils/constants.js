@@ -144,14 +144,16 @@ export const columns = [
 
 export const ResponseOutstandingFormBlueprint = {
   section1: [
-    { label: "Client", name: "client" },
+    { label: "Demand Reference Number", name: "demand_reference_no" },
     { label: "Assessment Year", name: "assessment_year" },
-    { label: "Rectification Rights", name: "rectification_rights" },
-    { label: "Outstanding Demand Amount", name: "outstanding_demand_amount" },
+    { label: "Section Code", name: "section_code" },
+    { label: "Client", name: "client" },
   ],
   section2: [
-    { label: "Notice ID", name: "id" },
-    { label: "Demand Reference Number", name: "demand_reference_no" },
+    { label: "Rectification Rights", name: "rectification_rights" },
+    { label: "Mode Of Service ", name: "mode_of_service" },
+    { label: "Response Type", name: "response_type" },
+    { label: "Outstanding Demand Amount", name: "outstanding_demand_amount" },
   ],
   section3: [],
   section4: [{ label: "Notice ID", name: "id" }],

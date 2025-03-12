@@ -20,6 +20,10 @@ import { ResponseOutstandings } from "./pages/income-tax/RODemands";
 import { GSTNoticeList } from "./pages/gst/GstNoticesList";
 import { TDSNoticeList } from "./pages/tds/TDSNoticesList";
 import { GSTAdditionalNoticesList } from "./pages/gst/GSTAdditionalNoticesList";
+import AddEproceedingForm from "./components/AddEproceedingForm";
+import AddResponseOutstandingsForm from "./components/AddResponseOutstandingsForm";
+import AddGSTNoticeForm from "./components/AddGSTNoticeForm";
+import AddAdditionalNoticeForm from "./components/AddAdditionalNoticeForm";
 
 function App() {
   return (
@@ -57,14 +61,26 @@ function App() {
             path="notices"
             element={<GSTNoticeList serviceType={ServiceType.GSTIN} />}
           />
+
           <Route
             path="notices/:clientId"
             element={<GSTNoticeList serviceType={ServiceType.GSTIN} />}
+          />
+
+          <Route
+            path="add-notices/:clientId"
+            element={<AddGSTNoticeForm serviceType={ServiceType.GSTIN} />}
           />
           <Route
             path="additional-notices/:clientId"
             element={
               <GSTAdditionalNoticesList serviceType={ServiceType.GSTIN} />
+            }
+          />
+          <Route
+            path="add-additional-notices/:clientId"
+            element={
+              <AddAdditionalNoticeForm serviceType={ServiceType.GSTIN} />
             }
           />
           <Route
@@ -98,6 +114,17 @@ function App() {
             element={<Eproceedings serviceType={ServiceType.INCOME_TAX} />}
           />
           <Route
+            path="notices"
+            element={<Eproceedings serviceType={ServiceType.INCOME_TAX} />}
+          />
+
+          <Route
+            path="add-eproceedings/:clientId"
+            element={
+              <AddEproceedingForm serviceType={ServiceType.INCOME_TAX} />
+            }
+          />
+          <Route
             path="eproceeding-details"
             element={<EPForm serviceType={ServiceType.INCOME_TAX} />}
           />
@@ -105,6 +132,15 @@ function App() {
             path="responseoutstandings/:clientId"
             element={
               <ResponseOutstandings serviceType={ServiceType.INCOME_TAX} />
+            }
+          />
+
+          <Route
+            path="add-responseoutstandings/:clientId"
+            element={
+              <AddResponseOutstandingsForm
+                serviceType={ServiceType.INCOME_TAX}
+              />
             }
           />
 

@@ -1,24 +1,45 @@
 import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/PageTitle";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Table } from "../../components/Table";
+
 import AppContext from "../../context/AppContext";
 import { postData } from "../../api/apiService";
-import { Button, Checkbox, Divider, Modal, Tag, Typography } from "antd";
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Input,
+  Modal,
+  Table,
+  Tag,
+  Typography,
+  Upload,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import ReactQuill from "react-quill-new";
-import "react-quill-new/dist/quill.snow.css";
-import { LoadingOutlined } from "@ant-design/icons";
+// import "react-quill-new/dist/quill.snow.css";
+import {
+  LoadingOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { toast } from "react-toastify";
 import WarningImage from "../../assets/images/Warning.png";
 import { useFormParams } from "../../hooks/useFormParams";
+import axios from "axios";
 
 export const EPForm = ({ serviceType }) => {
   const { selectedEproceeding, setSelectedEproceeding } =
     useContext(AppContext);
 
   const [sendResponse, setSendResponse] = useState(false);
-  const [maskedFields, setMaskedFields] = useState([]);
+  const [maskedFields, setMaskedFields] = useState([
+    "pan",
+    "aadhaar_card",
+    "dates",
+    "email",
+    "phone_number",
+  ]);
   const [showMaskedData, setShowMaskedData] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
@@ -40,6 +61,8 @@ export const EPForm = ({ serviceType }) => {
   const queryParams = new URLSearchParams(location.search);
   const formType = queryParams.get("formType");
 
+  const [attachedDocuments, setAttachedDocuments] = useState([]);
+
   const {
     decodedID,
     formParams,
@@ -55,19 +78,16 @@ export const EPForm = ({ serviceType }) => {
 
   const decodedDynamicFormID = decodedID ? decodeURIComponent(decodedID) : null;
 
+  const [file, setFile] = useState(null);
+  const [fileFormData, setFileFormData] = useState({
+    is_private: "1",
+    doctype: FormType,
+    docname: decodedDynamicFormID,
+  });
+
   const { Text } = Typography;
 
-  const fields = [
-    "Notice ID",
-    "Name",
-    "Email",
-    "Phone",
-    "Address",
-    "Date of Birth",
-    "PAN",
-    "Aadhaar",
-    "Other",
-  ];
+  const fields = ["PAN", "Email", "Phone Number", "Aadhaar Card", "Dates"];
   const [formData, setFormData] = useState(initialFormData);
 
   const handleCheckboxChange = (event) => {
@@ -105,20 +125,36 @@ export const EPForm = ({ serviceType }) => {
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, file: e.target.files[0] });
+    setFile(e.target.files[0]);
   };
 
   const columns = [
-    { label: "File Name", key: "file_name" },
-    { label: "File", key: "file" },
+    { title: "File Name", dataIndex: "file_name", key: "file_name" },
+    { title: "File", dataIndex: "file", key: "file" },
   ];
 
   const tdsColumns = [
-    { label: "Notice ID", key: "id" },
-    { label: "Financial Year", key: "manual_demand" },
-    { label: "Manual Demand", key: "financial_year" },
-    { label: "Processed Demand", key: "processed_demand" },
-    { label: "TDS Summary Details", key: "tds_summary_details" },
+    { title: "Notice ID", dataIndex: "id", key: "id" },
+    {
+      title: "Financial Year",
+      dataIndex: "manual_demand",
+      key: "manual_demand",
+    },
+    {
+      title: "Manual Demand",
+      dataIndex: "financial_year",
+      key: "financial_year",
+    },
+    {
+      title: "Processed Demand",
+      dataIndex: "processed_demand",
+      key: "processed_demand",
+    },
+    {
+      title: "TDS Summary Details",
+      dataIndex: "tds_summary_details",
+      key: "tds_summary_details",
+    },
   ];
 
   const getFormDetails = async (selectedID) => {
@@ -222,6 +258,46 @@ export const EPForm = ({ serviceType }) => {
     }
   };
 
+  const uploadFile = async () => {
+    try {
+      setLoading(true);
+
+      const payload = new FormData();
+      payload.append("is_private", fileFormData.is_private);
+      payload.append("doctype", fileFormData.doctype);
+      payload.append("docname", fileFormData.docname);
+      payload.append("file", file, file.name);
+
+      const token =
+        localStorage.getItem("authToken") || "9fbc6df30ef1431:6d4f68e133966b7";
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `token ${token}`,
+        },
+      };
+
+      const response = await axios.post(
+        process.env.REACT_APP_API_BASE_URL + "fin_buddy.api.upload_file",
+        payload,
+        config
+      );
+
+      toast.info("File uploaded successfully", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } catch (error) {
+      toast.error("Error uploading file", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const showModal = () => {
     setIsSubmitModalOpen(true);
   };
@@ -233,6 +309,51 @@ export const EPForm = ({ serviceType }) => {
   const handleCancel = () => {
     setIsSubmitModalOpen(false);
   };
+
+  const handleAddRow = () => {
+    const newRow = {
+      key: attachedDocuments.length + 1,
+      fileName: "",
+      file: null,
+    };
+    setAttachedDocuments([...attachedDocuments, newRow]);
+  };
+
+  const handleEditRow = (index, field, value) => {
+    const newData = [...attachedDocuments];
+    newData[index][field] = value;
+    setAttachedDocuments(newData);
+  };
+
+  const attachedDocumentsColumns = [
+    {
+      title: "File Name",
+      dataIndex: "file_name",
+      key: "file_name",
+      render: (text, record, index) => (
+        <Input
+          value={text}
+          placeholder="File Name"
+          onChange={(e) => handleEditRow(index, "fileName", e.target.value)}
+        />
+      ),
+    },
+    {
+      title: "File",
+      dataIndex: "file",
+      key: "file",
+      render: (text, record, index) => (
+        <Upload
+          beforeUpload={(file) => {
+            handleEditRow(index, "file", file);
+            return false;
+          }}
+        >
+          <Button icon={<UploadOutlined />}>Attach</Button>
+        </Upload>
+      ),
+    },
+  ];
 
   useEffect(() => {
     if (decodedDynamicFormID) {
@@ -391,6 +512,28 @@ export const EPForm = ({ serviceType }) => {
                     />
                   </div>
                 ))}
+              <div>
+                {" "}
+                <div className="flex justify-between items-center">
+                  <label className="block text-gray-700 font-medium ">
+                    Upload Document
+                  </label>
+                  {file && (
+                    <p
+                      type="text"
+                      className="text-blue-600 hover:underline text-md cursor-pointer "
+                      onClick={uploadFile}
+                    >
+                      Upload File
+                    </p>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className=" p-2 border rounded-md cursor-pointer w-full"
+                />
+              </div>
             </div>
           </div>
 
@@ -429,24 +572,24 @@ export const EPForm = ({ serviceType }) => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium">
+              <label className="block  text-lg font-semibold mt-4 text-gray-700 font-medium">
                 Attachments for response generation
               </label>
+
               <Table
-                columns={columns}
-                data={formData?.other_documents || []}
-                type="documents"
-                itemsPerPage={10}
-                isPagination={0}
+                columns={attachedDocumentsColumns}
+                dataSource={attachedDocuments}
+                pagination={false}
+                bordered
               />
-              <label className="block text-gray-700 font-medium mt-4">
-                Upload Document
-              </label>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className=" p-2 border rounded-md cursor-pointer"
-              />
+              <Button
+                onClick={handleAddRow}
+                icon={<PlusOutlined />}
+                className="mt-4"
+              >
+                Add Row
+              </Button>
+
               {formData.file && (
                 <p className="mt-2 text-sm text-gray-600">
                   Selected File: {formData.file.name}
@@ -456,8 +599,21 @@ export const EPForm = ({ serviceType }) => {
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">
-              Mask Data
+              Mask This Data
             </label>
+            <div className="mt-4 mb-4">
+              <TextArea
+                variant="filled"
+                name="mask_this_data"
+                value={formData.mask_this_data}
+                onChange={handleChange}
+                placeholder="Enter the names you want to mask in comma separated format here. (Example : name1, name2, name3)"
+                autoSize={{
+                  minRows: 6,
+                  maxRows: 8,
+                }}
+              />
+            </div>
             <div className="flex flex-wrap gap-4">
               {fields.map((item, index) => {
                 const value = item.toLowerCase().replace(/\s/g, "_");
@@ -475,21 +631,6 @@ export const EPForm = ({ serviceType }) => {
                 );
               })}
             </div>
-            {maskedFields.includes("other") && (
-              <div className="mt-4">
-                <TextArea
-                  variant="filled"
-                  name="mask_this_data"
-                  value={formData.mask_this_data}
-                  onChange={handleChange}
-                  placeholder="Enter the names you want to mask in comma separated format here. (Example : name1, name2, name3)"
-                  autoSize={{
-                    minRows: 4,
-                    maxRows: 6,
-                  }}
-                />
-              </div>
-            )}
 
             <div className="flex items-center gap-8 ">
               <Button
@@ -523,26 +664,25 @@ export const EPForm = ({ serviceType }) => {
               </>
             )}
 
-            {/* <p style={{ margin: "20px 0px" }}>
+            <p style={{ margin: "5px 0px" }}>
               <Checkbox
                 checked={sendResponse}
-                disabled={disabled}
+                // disabled={disabled}
                 onChange={onSendResponseChange}
               >
                 Send your data to AI Model for response generation?
               </Checkbox>
-            </p> */}
+            </p>
 
-            {sendResponse && (
-              <Button
-                variant="filled"
-                type="primary"
-                className="my-4 min-w-[200px]"
-                onClick={() => setOpenTandCModal(true)}
-              >
-                Generate Response
-              </Button>
-            )}
+            <Button
+              variant="filled"
+              type="primary"
+              disabled={!sendResponse}
+              className="my-4 min-w-[200px]"
+              onClick={() => setOpenTandCModal(true)}
+            >
+              Generate Response
+            </Button>
           </div>
           {formData.response_message && (
             <div className="mb-6  pb-6">
