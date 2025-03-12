@@ -13,6 +13,7 @@ const urlMapping = {
 };
 
 export const Notice = ({ serviceType }) => {
+  console.log("service Type Notice=>", serviceType);
   const [notices, setNotices] = useState([]);
   const [fetchNotices, { loading }] = useAxiosPost(
     urlMapping.fetchClients[serviceType]

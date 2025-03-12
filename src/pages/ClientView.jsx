@@ -70,6 +70,14 @@ export const ClientView = ({ serviceType }) => {
                 2
               </span>
             </button>
+            <button
+              // onClick={() =>
+              //   navigate(`/${serviceType}/notices?clientId=${clientId}`)
+              // }
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            >
+              Sync
+            </button>
           </div>
         )}
 
@@ -91,6 +99,14 @@ export const ClientView = ({ serviceType }) => {
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
             >
               GST Notice
+            </button>
+            <button
+              // onClick={() =>
+              //   navigate(`/${serviceType}/notices?clientId=${clientId}`)
+              // }
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+            >
+              Sync
             </button>
           </div>
         )}
@@ -124,7 +140,7 @@ export const ClientView = ({ serviceType }) => {
                 className="w-full p-2 border rounded bg-gray-100 text-gray-800"
               />
             </div>
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 name="disabled"
@@ -133,7 +149,7 @@ export const ClientView = ({ serviceType }) => {
                 className="h-4 w-4 text-blue-600"
               />
               <label className="text-gray-600 text-sm">Disabled</label>
-            </div>
+            </div> */}
           </div>
         </div>
 

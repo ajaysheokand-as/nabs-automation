@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { InfoCard } from "../components/InfoCard";
 import { Calender } from "../components/Calender";
 import { FaRegCalendar, FaRegClock, FaFileAlt } from "react-icons/fa";
@@ -11,23 +11,65 @@ import {
 } from "react-icons/fa";
 
 import { useNavigate } from "react-router-dom";
+import { useAxiosPost } from "../hooks/useAxios";
+import { CardTypes } from "../utils/enums";
 
 export const IncomeTax = () => {
   const navigate = useNavigate();
+  const [cardsData, setCardsData] = useState({});
+  const [fetchGSTCards] = useAxiosPost("fin_buddy.api.get_income_tax_cards");
 
-  const data = [
-    { title: "Company 1", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 2", count: 0, icon: <FaRegCalendar /> },
-    { title: "Company 3", count: 0, icon: <FaRegClock /> },
-    { title: "Company 4", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 5", count: 0, icon: <FaFileAlt /> },
-    { title: "Company 6", count: 0, icon: <FaFileAlt /> },
-  ];
+  useEffect(() => {
+    fetchGSTCards({
+      cb: (data) => {
+        setCardsData(data?.result || {});
+      },
+    });
+  }, []);
 
-  const columns = [
-    { label: "Title", key: "title" },
-    { label: "Count", key: "count" },
-    { label: "Icon", key: "icon" },
+  const Cards = [
+    {
+      id: CardTypes.TOTAL_NOTICES,
+      title: "Total Notices",
+      path: "notice",
+      icon: FaFileAlt,
+    },
+    {
+      id: CardTypes.OPEN_NOTICES,
+      title: "Open Notices",
+      icon: FaFileAlt,
+    },
+    {
+      id: CardTypes.TOTAL_CLIENTS,
+      title: "Total Clients",
+      path: "clients",
+      icon: FaFileAlt,
+    },
+    {
+      id: CardTypes.LAST_24_HOURS,
+      title: "Last 24 Hours",
+      icon: FaRegClock,
+    },
+    {
+      id: CardTypes.OVER_DUE_7_DAYS,
+      title: "Due within 7 days",
+      icon: FaRegCalendar,
+    },
+    {
+      id: CardTypes.failed_login,
+      title: "Failed Login",
+      icon: FaRegCalendar,
+    },
+    {
+      id: CardTypes.LAST_15_DAYS,
+      title: "Last 15 Days",
+      icon: FaRegCalendar,
+    },
+    {
+      id: CardTypes.OVER_DUE,
+      title: "Over Due",
+      icon: FaFileAlt,
+    },
   ];
 
   return (
@@ -45,35 +87,64 @@ export const IncomeTax = () => {
       </div> */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Cards Section */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6 ">
+          {/* Action Buttons */}
+
+          {Cards.map((card, index) => (
+            <InfoCard
+              key={index}
+              title={card.title}
+              count={cardsData[card.id] || 0}
+              icon={<card.icon />}
+              onClick={() => {
+                if (card.path) {
+                  navigate(card.path);
+                }
+              }}
+            />
+          ))}
+        </div>
+        {/* <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <InfoCard
             title="Total Notices"
-            count="10"
+            count={cardsData?.total_notices || 0}
             onClick={() => navigate("notice")}
             icon={<FaFileAlt />}
           />
           <InfoCard
             title="Open Notices"
-            count="0"
+            count={cardsData?.total_notices || 0}
             icon={<FaExclamationTriangle />}
           />
           <InfoCard
             title="Total Clients"
-            count="3"
+            count={cardsData?.total_notices || 0}
             onClick={() => navigate("clients")}
             icon={<FaIdCard />}
           />
           <InfoCard title="Last 24 Hours" count="0" icon={<FaRegClock />} />
           <InfoCard
             title="Due within 7 Days"
-            count="0"
+            count={cardsData?.total_notices || 0}
             icon={<FaExclamationCircle />}
           />
-          <InfoCard title="Failed Logins" count="0" icon={<FaUserLock />} />
-          <InfoCard title="Last 15 Days" count="0" icon={<FaRegClock />} />
+          <InfoCard
+            title="Failed Logins"
+            count={cardsData?.total_notices || 0}
+            icon={<FaUserLock />}
+          />
+          <InfoCard
+            title="Last 15 Days"
+            count={cardsData?.total_notices || 0}
+            icon={<FaRegClock />}
+          />
 
-          <InfoCard title="Over Due" count="0" icon={<FaTimesCircle />} />
-        </div>
+          <InfoCard
+            title="Over Due"
+            count={cardsData?.total_notices || 0}
+            icon={<FaTimesCircle />}
+          />
+        </div> */}
         <Calender />
       </div>
 
