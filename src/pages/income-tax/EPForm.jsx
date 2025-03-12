@@ -1,14 +1,28 @@
 import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/PageTitle";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Table } from "../../components/Table";
+
 import AppContext from "../../context/AppContext";
 import { postData } from "../../api/apiService";
-import { Button, Checkbox, Divider, Modal, Tag, Typography } from "antd";
+import {
+  Button,
+  Checkbox,
+  Divider,
+  Input,
+  Modal,
+  Table,
+  Tag,
+  Typography,
+  Upload,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import ReactQuill from "react-quill-new";
 // import "react-quill-new/dist/quill.snow.css";
-import { LoadingOutlined } from "@ant-design/icons";
+import {
+  LoadingOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import { toast } from "react-toastify";
 import WarningImage from "../../assets/images/Warning.png";
 import { useFormParams } from "../../hooks/useFormParams";
@@ -46,6 +60,8 @@ export const EPForm = ({ serviceType }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const formType = queryParams.get("formType");
+
+  const [attachedDocuments, setAttachedDocuments] = useState([]);
 
   const {
     decodedID,
@@ -113,16 +129,32 @@ export const EPForm = ({ serviceType }) => {
   };
 
   const columns = [
-    { label: "File Name", key: "file_name" },
-    { label: "File", key: "file" },
+    { title: "File Name", dataIndex: "file_name", key: "file_name" },
+    { title: "File", dataIndex: "file", key: "file" },
   ];
 
   const tdsColumns = [
-    { label: "Notice ID", key: "id" },
-    { label: "Financial Year", key: "manual_demand" },
-    { label: "Manual Demand", key: "financial_year" },
-    { label: "Processed Demand", key: "processed_demand" },
-    { label: "TDS Summary Details", key: "tds_summary_details" },
+    { title: "Notice ID", dataIndex: "id", key: "id" },
+    {
+      title: "Financial Year",
+      dataIndex: "manual_demand",
+      key: "manual_demand",
+    },
+    {
+      title: "Manual Demand",
+      dataIndex: "financial_year",
+      key: "financial_year",
+    },
+    {
+      title: "Processed Demand",
+      dataIndex: "processed_demand",
+      key: "processed_demand",
+    },
+    {
+      title: "TDS Summary Details",
+      dataIndex: "tds_summary_details",
+      key: "tds_summary_details",
+    },
   ];
 
   const getFormDetails = async (selectedID) => {
@@ -230,13 +262,11 @@ export const EPForm = ({ serviceType }) => {
     try {
       setLoading(true);
 
-      console.log("FILEEL", file);
-
       const payload = new FormData();
       payload.append("is_private", fileFormData.is_private);
       payload.append("doctype", fileFormData.doctype);
       payload.append("docname", fileFormData.docname);
-      payload.append("attached_to_field", file, file.name);
+      payload.append("file", file, file.name);
 
       const token =
         localStorage.getItem("authToken") || "9fbc6df30ef1431:6d4f68e133966b7";
@@ -279,6 +309,51 @@ export const EPForm = ({ serviceType }) => {
   const handleCancel = () => {
     setIsSubmitModalOpen(false);
   };
+
+  const handleAddRow = () => {
+    const newRow = {
+      key: attachedDocuments.length + 1,
+      fileName: "",
+      file: null,
+    };
+    setAttachedDocuments([...attachedDocuments, newRow]);
+  };
+
+  const handleEditRow = (index, field, value) => {
+    const newData = [...attachedDocuments];
+    newData[index][field] = value;
+    setAttachedDocuments(newData);
+  };
+
+  const attachedDocumentsColumns = [
+    {
+      title: "File Name",
+      dataIndex: "file_name",
+      key: "file_name",
+      render: (text, record, index) => (
+        <Input
+          value={text}
+          placeholder="File Name"
+          onChange={(e) => handleEditRow(index, "fileName", e.target.value)}
+        />
+      ),
+    },
+    {
+      title: "File",
+      dataIndex: "file",
+      key: "file",
+      render: (text, record, index) => (
+        <Upload
+          beforeUpload={(file) => {
+            handleEditRow(index, "file", file);
+            return false;
+          }}
+        >
+          <Button icon={<UploadOutlined />}>Attach</Button>
+        </Upload>
+      ),
+    },
+  ];
 
   useEffect(() => {
     if (decodedDynamicFormID) {
@@ -500,13 +575,20 @@ export const EPForm = ({ serviceType }) => {
               <label className="block  text-lg font-semibold mt-4 text-gray-700 font-medium">
                 Attachments for response generation
               </label>
+
               <Table
-                columns={columns}
-                data={formData?.other_documents || []}
-                type="documents"
-                itemsPerPage={10}
-                isPagination={0}
+                columns={attachedDocumentsColumns}
+                dataSource={attachedDocuments}
+                pagination={false}
+                bordered
               />
+              <Button
+                onClick={handleAddRow}
+                icon={<PlusOutlined />}
+                className="mt-4"
+              >
+                Add Row
+              </Button>
 
               {formData.file && (
                 <p className="mt-2 text-sm text-gray-600">

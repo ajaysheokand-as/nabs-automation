@@ -12,75 +12,6 @@ import { FaArrowsRotate } from "react-icons/fa6";
 import moment from "moment";
 import { SyncOutlined } from "@ant-design/icons";
 
-const columns = [
-  {
-    label: "Name Of Assessee",
-    key: "client_name",
-  },
-  {
-    label: "Status",
-    key: "disabled",
-    render: (row) => {
-      return (
-        <div className="flex items-center h-14 justify-center">
-          {row?.disabled == "0" ? (
-            <Tag color="success">Enabled</Tag>
-          ) : (
-            <Tag color="red">Disabled</Tag>
-          )}
-        </div>
-      );
-    },
-  },
-  { label: "PAN/TAN", key: "username" },
-  // { label: "Password", key: "password" },
-  // { label: "ID", key: "id" },
-  {
-    label: "Last Synced",
-    key: "last_income_tax_sync",
-    render: (row) => {
-      const formattedDate = moment(row?.last_income_tax_sync).format(
-        "MMMM Do YYYY, h:mm:ss a"
-      );
-
-      return row?.last_income_tax_sync != "" ? (
-        <div className="flex items-center h-14 justify-center">
-          <Tag
-            icon={<SyncOutlined spin />}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minWidth: "200px",
-              padding: "5px",
-            }}
-            color="volcano"
-          >
-            {formattedDate}
-          </Tag>
-        </div>
-      ) : (
-        <>
-          <p>-</p>
-        </>
-      );
-    },
-  },
-  {
-    label: "Sync Notices",
-    key: "action",
-    render: (row) => {
-      return (
-        <div className="flex items-center justify-center">
-          <Button onClick={() => {}}>
-            <FaArrowsRotate />
-          </Button>
-        </div>
-      );
-    },
-  },
-];
-
 const urlMapping = {
   fetchClients: {
     [ServiceType.GSTIN]: "fin_buddy.api.gst_client_list",
@@ -101,6 +32,145 @@ export const Clients = ({ serviceType }) => {
   const [addNewClient] = useAxiosPost(urlMapping.addClients[serviceType]);
   const [openClientModal, setOpenClientModal] = useState(false);
   const [clientLoading, setClientLoading] = useState(true);
+
+  const GSTColumns = [
+    {
+      label: "Client Name",
+      key: "client_name",
+    },
+    {
+      label: "Status",
+      key: "disabled",
+      render: (row) => {
+        return (
+          <div className="flex items-center h-14 justify-center">
+            {row?.disabled == "0" ? (
+              <Tag color="processing">Enabled</Tag>
+            ) : (
+              <Tag color="red">Disabled</Tag>
+            )}
+          </div>
+        );
+      },
+    },
+    { label: "Username", key: "gst_username" },
+
+    {
+      label: "Last Synced",
+      key: "last_gst_sync",
+      render: (row) => {
+        const formattedDate = moment(row?.last_gst_sync).format(
+          "MMMM Do YYYY, h:mm:ss a"
+        );
+
+        return row?.last_gst_sync != "" ? (
+          <div className="flex items-center h-14 justify-center">
+            <Tag
+              icon={<SyncOutlined spin />}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: "200px",
+                padding: "5px",
+              }}
+              color="volcano"
+            >
+              {formattedDate}
+            </Tag>
+          </div>
+        ) : (
+          <>
+            <p>-</p>
+          </>
+        );
+      },
+    },
+    {
+      label: "Sync Notices",
+      key: "action",
+      render: (row) => {
+        return (
+          <div className="flex items-center justify-center">
+            <Button onClick={() => {}}>
+              <FaArrowsRotate />
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+  const columns =
+    serviceType == "gstin"
+      ? GSTColumns
+      : [
+          {
+            label: "Name Of Assessee",
+            key: "client_name",
+          },
+          {
+            label: "Status",
+            key: "disabled",
+            render: (row) => {
+              return (
+                <div className="flex items-center h-14 justify-center">
+                  {row?.disabled == "0" ? (
+                    <Tag color="processing">Enabled</Tag>
+                  ) : (
+                    <Tag color="red">Disabled</Tag>
+                  )}
+                </div>
+              );
+            },
+          },
+          { label: "PAN/TAN", key: "username" },
+          // { label: "Password", key: "password" },
+          // { label: "ID", key: "id" },
+          {
+            label: "Last Synced",
+            key: "last_income_tax_sync",
+            render: (row) => {
+              const formattedDate = moment(row?.last_income_tax_sync).format(
+                "MMMM Do YYYY, h:mm:ss a"
+              );
+
+              return row?.last_income_tax_sync != "" ? (
+                <div className="flex items-center h-14 justify-center">
+                  <Tag
+                    icon={<SyncOutlined spin />}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: "200px",
+                      padding: "5px",
+                    }}
+                    color="volcano"
+                  >
+                    {formattedDate}
+                  </Tag>
+                </div>
+              ) : (
+                <>
+                  <p>-</p>
+                </>
+              );
+            },
+          },
+          {
+            label: "Sync Notices",
+            key: "action",
+            render: (row) => {
+              return (
+                <div className="flex items-center justify-center">
+                  <Button onClick={() => {}}>
+                    <FaArrowsRotate />
+                  </Button>
+                </div>
+              );
+            },
+          },
+        ];
 
   const getClientsData = () => {
     setClientLoading(true);

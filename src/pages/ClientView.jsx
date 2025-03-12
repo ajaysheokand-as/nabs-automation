@@ -136,9 +136,6 @@ export const ClientView = ({ serviceType }) => {
                 }
               >
                 E Proceeding{" "}
-                {/* <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded ml-2">
-                2
-              </span> */}
               </Button>
               <Button
                 type="primary"
@@ -154,21 +151,40 @@ export const ClientView = ({ serviceType }) => {
 
         {serviceType === ServiceType.GSTIN && (
           <div className="flex justify-between mb-6">
-            <Button
-              type="primary"
-              onClick={() =>
-                navigate(`/${serviceType}/additional-notices/${clientId}`)
-              }
-            >
-              Additional Notice
-            </Button>
-
-            <Button
-              type="primary"
-              onClick={() => navigate(`/${serviceType}/notices/${clientId}`)}
-            >
-              GST Notice
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/${serviceType}/additional-notices/${clientId}`)
+                }
+              >
+                GST Additional Notice And Order
+              </Button>
+              {/* <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/${serviceType}/add-additional-notices/${clientId}`)
+                }
+              >
+                <FaPlus />
+              </Button> */}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="primary"
+                onClick={() => navigate(`/${serviceType}/notices/${clientId}`)}
+              >
+                GST Notice And Order
+              </Button>
+              <Button
+                type="primary"
+                onClick={() =>
+                  navigate(`/${serviceType}/add-notices/${clientId}`)
+                }
+              >
+                <FaPlus />
+              </Button>
+            </div>
           </div>
         )}
 
@@ -200,17 +216,19 @@ export const ClientView = ({ serviceType }) => {
                 className="w-full p-2 border rounded bg-gray-100 text-gray-800 font-semibold"
               />
             </div>
-            <div>
-              <label className="text-gray-600 text-sm">DOB</label>
-              <Input
-                type="text"
-                name="dob"
-                value={formData.dob}
-                onChange={handleChange}
-                placeholder="DD/MM/YYYY"
-                className="w-full p-2 border rounded bg-gray-100 text-gray-800"
-              />
-            </div>
+            {serviceType != ServiceType.GSTIN && (
+              <div>
+                <label className="text-gray-600 text-sm">DOB</label>
+                <Input
+                  type="text"
+                  name="dob"
+                  value={formData.dob}
+                  onChange={handleChange}
+                  placeholder="DD/MM/YYYY"
+                  className="w-full p-2 border rounded bg-gray-100 text-gray-800"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -227,7 +245,11 @@ export const ClientView = ({ serviceType }) => {
               <Input
                 type="text"
                 name="username"
-                value={formData?.username}
+                value={
+                  serviceType === ServiceType.GSTIN
+                    ? formData.gst_username
+                    : formData?.username
+                }
                 className="w-full p-2 border rounded bg-gray-100 font-semibold text-gray-800"
               />
             </div>
@@ -238,7 +260,11 @@ export const ClientView = ({ serviceType }) => {
               <Input
                 type="password"
                 name="password"
-                value={formData.password}
+                value={
+                  serviceType === ServiceType.GSTIN
+                    ? formData.gst_password
+                    : formData?.password
+                }
                 className="w-full p-2 border rounded bg-gray-100 text-gray-800"
               />
             </div>
@@ -255,7 +281,11 @@ export const ClientView = ({ serviceType }) => {
             <Input
               type="text"
               name="lastSync"
-              value={formData.last_income_tax_sync}
+              value={
+                serviceType === ServiceType.GSTIN
+                  ? formData.last_gst_sync
+                  : formData?.last_income_tax_sync
+              }
               disabled
               className="w-full p-2 border rounded bg-gray-100 text-gray-800"
             />
