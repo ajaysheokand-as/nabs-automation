@@ -3,7 +3,7 @@ import PageTitle from "../components/PageTitle";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAxiosPost } from "../hooks/useAxios";
 import { ServiceType } from "../utils/enums";
-import { Breadcrumb, Button, Input } from "antd";
+import { Badge, Breadcrumb, Button, Input } from "antd";
 import { FaPlus } from "react-icons/fa";
 
 const urlMapping = {
@@ -19,10 +19,31 @@ export const ClientView = ({ serviceType }) => {
   const { clientId } = useParams();
 
   const [formData, setFormData] = useState({});
+  const [responseOutstandingsCount, setResponseOutstandingsCount] = useState(0);
+  const [eproceedingsCount, setEproceedingsCount] = useState(0);
+
+  const [fetchNoticeCounts] = useAxiosPost("frappe.desk.reportview.get_count");
 
   const [fetchClientDetails] = useAxiosPost(
     urlMapping.fetchClients[serviceType]
   );
+
+  const getNoticesCount = (docType) => {
+    fetchNoticeCounts({
+      payload: {
+        doctype: docType,
+        filters: [["client", "=", clientId]],
+      },
+      cb: (data) => {
+        if (docType == "Response to Outstanding Demand") {
+          setResponseOutstandingsCount(data?.message);
+        } else if ("E Proceeding") {
+          setEproceedingsCount(data?.message);
+        }
+        setFormData(data?.result || {});
+      },
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -38,10 +59,16 @@ export const ClientView = ({ serviceType }) => {
         id: clientId,
       },
       cb: (data) => {
-        console.log(data);
         setFormData(data?.result || {});
       },
     });
+  }, []);
+
+  useEffect(() => {
+    if (serviceType == "income-tax") {
+      getNoticesCount("Response to Outstanding Demand");
+      getNoticesCount("E Proceeding");
+    }
   }, []);
 
   return (
@@ -108,15 +135,20 @@ export const ClientView = ({ serviceType }) => {
         {/* Buttons */}
         {serviceType === ServiceType.INCOME_TAX && (
           <div className="flex justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Button
-                type="primary"
-                onClick={() =>
-                  navigate(`/${serviceType}/responseoutstandings/${clientId}`)
-                }
+            <div className="flex items-center gap-4">
+              <Badge
+                count={responseOutstandingsCount}
+                style={{ zIndex: "999" }}
               >
-                Response to Outstanding Demand
-              </Button>
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    navigate(`/${serviceType}/responseoutstandings/${clientId}`)
+                  }
+                >
+                  Response to Outstanding Demand
+                </Button>
+              </Badge>
               <Button
                 type="primary"
                 onClick={() =>
@@ -128,15 +160,18 @@ export const ClientView = ({ serviceType }) => {
                 <FaPlus />
               </Button>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                type="primary"
-                onClick={() =>
-                  navigate(`/${serviceType}/eproceedings/${clientId}`)
-                }
-              >
-                E Proceeding{" "}
-              </Button>
+            <div className="flex items-center gap-4">
+              <Badge count={eproceedingsCount} style={{ zIndex: "999" }}>
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    navigate(`/${serviceType}/eproceedings/${clientId}`)
+                  }
+                >
+                  E Proceeding{" "}
+                </Button>
+              </Badge>
+
               <Button
                 type="primary"
                 onClick={() =>
@@ -151,7 +186,7 @@ export const ClientView = ({ serviceType }) => {
 
         {serviceType === ServiceType.GSTIN && (
           <div className="flex justify-between mb-6">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Button
                 type="primary"
                 onClick={() =>

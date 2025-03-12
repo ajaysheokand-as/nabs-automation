@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AppContext from "../context/AppContext";
 import { FileExclamationOutlined } from "@ant-design/icons";
-import { Spin } from "antd";
+import { Checkbox, Spin } from "antd";
 
 export const Table = ({
   columns,
@@ -13,8 +13,12 @@ export const Table = ({
   serviceType = null,
   isLoading = false,
   type = null,
+  selectedClientIds,
+  setSelectedClientIds,
 }) => {
   const navigate = useNavigate();
+  const { clientId } = useParams();
+
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const { setSelectedEproceeding } = useContext(AppContext);
@@ -48,21 +52,23 @@ export const Table = ({
     } else if (rowRedirection && typeof rowRedirection === "string") {
       if (type == "eproceeding") {
         navigate(
-          `${rowRedirection}?proceedingID=${data?.id}&formType=eproceedings`
+          `${rowRedirection}?proceedingID=${data?.id}&formType=eproceedings&clientId=${clientId}`
         );
       } else if (type == "responseoutstandings") {
         navigate(
-          `${rowRedirection}?responseID=${data?.id}&formType=responseOutstandings`
+          `${rowRedirection}?responseID=${data?.id}&formType=responseOutstandings&clientId=${clientId}`
         );
       } else if (type == "notices" && serviceType == "gstin") {
-        navigate(`${rowRedirection}?noticeID=${data?.id}&formType=notices`);
+        navigate(
+          `${rowRedirection}?noticeID=${data?.id}&formType=notices&clientId=${clientId}`
+        );
       } else if (type == "notices" && serviceType == "tds") {
         navigate(
-          `${rowRedirection}?tdsNoticeID=${data?.id}&formType=tdsNotices`
+          `${rowRedirection}?tdsNoticeID=${data?.id}&formType=tdsNotices&clientId=${clientId}`
         );
       } else if (type == "additional-notices") {
         navigate(
-          `${rowRedirection}?additionalNoticeID=${data?.id}&formType=additionalNotices`
+          `${rowRedirection}?additionalNoticeID=${data?.id}&formType=additionalNotices&clientId=${clientId}`
         );
       } else {
         navigate(rowRedirection);
@@ -70,11 +76,41 @@ export const Table = ({
     }
   };
 
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      const allClientIds = paginatedData.map((row) => row.id);
+      setSelectedClientIds(allClientIds);
+    } else {
+      setSelectedClientIds([]);
+    }
+  };
+
+  const handleSelectClient = (clientId) => {
+    setSelectedClientIds((prev) =>
+      prev.includes(clientId)
+        ? prev.filter((id) => id !== clientId)
+        : [...prev, clientId]
+    );
+  };
+
   return (
     <div className="w-full overflow-x-auto bg-white shadow-md rounded-lg p-4">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-200 text-left">
+            {type === "clients" && (
+              <th align="center" className="p-3 border-b">
+                <Checkbox
+                  className="table-checkbox"
+                  onChange={handleSelectAll}
+                  checked={selectedClientIds.length === paginatedData.length}
+                  indeterminate={
+                    selectedClientIds.length > 0 &&
+                    selectedClientIds.length < paginatedData.length
+                  }
+                />
+              </th>
+            )}
             {columns.map((col, index) => (
               <th align="center" key={index} className="p-3 border-b">
                 {col.label}
@@ -87,6 +123,15 @@ export const Table = ({
           {paginatedData.length > 0 && !isLoading ? (
             paginatedData.map((row, rowIndex) => (
               <tr key={rowIndex} className="border-b hover:bg-gray-100">
+                {type === "clients" && (
+                  <td className="p-3 text-center">
+                    <Checkbox
+                      className="table-checkbox"
+                      checked={selectedClientIds.includes(row.id)}
+                      onChange={() => handleSelectClient(row.id)}
+                    />
+                  </td>
+                )}
                 {columns.map((col, colIndex) => {
                   if (col.render) {
                     return (

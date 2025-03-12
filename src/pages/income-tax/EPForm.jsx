@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import PageTitle from "../../components/PageTitle";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import AppContext from "../../context/AppContext";
 import { postData } from "../../api/apiService";
@@ -19,14 +19,18 @@ import TextArea from "antd/es/input/TextArea";
 import ReactQuill from "react-quill-new";
 // import "react-quill-new/dist/quill.snow.css";
 import {
+  DeleteOutlined,
+  LinkOutlined,
   LoadingOutlined,
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import WarningImage from "../../assets/images/Warning.png";
+import SubmitGif from "../../assets/images/SubmitGif.gif";
 import { useFormParams } from "../../hooks/useFormParams";
 import axios from "axios";
+import FileUploadModal from "../../components/FileUploadModal";
 
 export const EPForm = ({ serviceType }) => {
   const { selectedEproceeding, setSelectedEproceeding } =
@@ -42,6 +46,7 @@ export const EPForm = ({ serviceType }) => {
   ]);
   const [showMaskedData, setShowMaskedData] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [confirmSubmitModalOpen, setConfirmSubmitModalOpen] = useState(false);
 
   const [viewResponseLoading, setViewResponseLoading] = useState(false);
   const [viewResponse, setViewResponse] = useState(null);
@@ -60,8 +65,7 @@ export const EPForm = ({ serviceType }) => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const formType = queryParams.get("formType");
-
-  const [attachedDocuments, setAttachedDocuments] = useState([]);
+  const clientId = queryParams.get("clientId");
 
   const {
     decodedID,
@@ -89,12 +93,21 @@ export const EPForm = ({ serviceType }) => {
 
   const fields = ["PAN", "Email", "Phone Number", "Aadhaar Card", "Dates"];
   const [formData, setFormData] = useState(initialFormData);
+  const [selectedUploadType, setSelectedUploadType] = useState(null);
+
+  const [responseAcknowledgement, setResponseAcknowledgement] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
 
   const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target;
-    setMaskedFields((prev) =>
-      checked ? [...prev, value] : prev.filter((item) => item !== value)
-    );
+    const { value, checked, name } = event.target;
+
+    handleChange({
+      target: {
+        name: name,
+        value: checked ? 1 : 0,
+      },
+    });
   };
 
   const onSendResponseChange = (e) => {
@@ -124,13 +137,77 @@ export const EPForm = ({ serviceType }) => {
     setIsFormChanged(Object.keys(changedFields)?.length > 0);
   };
 
+  console.log("FORM DATTAT", formData);
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
+  const handleAddRow = () => {
+    const newRow = {
+      key: formData?.replies.length + 1,
+      file_name: "",
+      file: null,
+    };
+    handleChange({
+      target: { name: "replies", value: [...formData.replies, newRow] },
+    });
+  };
+
+  const handleEditRow = (index, field, value) => {
+    const newData = [...formData.replies];
+    newData[index][field] = value;
+    handleChange({
+      target: { name: "replies", value: newData },
+    });
+  };
+
   const columns = [
-    { title: "File Name", dataIndex: "file_name", key: "file_name" },
-    { title: "File", dataIndex: "file", key: "file" },
+    {
+      title: "File Name",
+      dataIndex: "file_name",
+      key: "file_name",
+      render: (text, record, index) => (
+        <Input
+          value={text}
+          placeholder="File Name"
+          onChange={(e) => handleEditRow(index, "file_name", e.target.value)}
+        />
+      ),
+    },
+    {
+      title: "File",
+      dataIndex: "file",
+      key: "file",
+      render: (text, record, index) =>
+        record.file ? (
+          <div className="flex items-center space-x-2">
+            <a href={record.file} target="_blank" rel="noopener noreferrer">
+              <Button icon={<LinkOutlined />}>View</Button>
+            </a>
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                const updatedReplies = [...formData?.replies];
+                updatedReplies[index].file = null;
+                handleChange({
+                  target: { name: "replies", value: updatedReplies },
+                });
+              }}
+            />
+          </div>
+        ) : (
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() => {
+              setSelectedUploadType(`reply-${index}`);
+              setIsModalVisible(true);
+            }}
+          >
+            Attach
+          </Button>
+        ),
+    },
   ];
 
   const tdsColumns = [
@@ -258,14 +335,14 @@ export const EPForm = ({ serviceType }) => {
     }
   };
 
-  const uploadFile = async () => {
+  const handleUpload = async (file) => {
     try {
-      setLoading(true);
+      setUploadLoading(true);
 
       const payload = new FormData();
-      payload.append("is_private", fileFormData.is_private);
-      payload.append("doctype", fileFormData.doctype);
-      payload.append("docname", fileFormData.docname);
+      payload.append("is_private", "1");
+      payload.append("doctype", FormType);
+      payload.append("docname", decodedDynamicFormID);
       payload.append("file", file, file.name);
 
       const token =
@@ -283,10 +360,40 @@ export const EPForm = ({ serviceType }) => {
         config
       );
 
+      const fileURL = response?.data?.file_url;
+
+      if (fileURL) {
+        if (selectedUploadType == "notice_letter") {
+          handleChange({ target: { value: fileURL, name: "notice_letter" } });
+        } else if (selectedUploadType == "response_acknowledgement") {
+          handleChange("response_acknowledgement", {
+            target: { value: fileURL, name: "notice_letter" },
+          });
+
+          setResponseAcknowledgement(fileURL);
+        } else if (selectedUploadType?.startsWith("otherDocuments")) {
+          const index = parseInt(selectedUploadType.split("-")[1], 10);
+          const upadtedOtherDocuments = [...formData?.other_documents];
+          upadtedOtherDocuments[index].file = fileURL;
+          handleChange({
+            target: { value: upadtedOtherDocuments, name: "other_documents" },
+          });
+        } else if (selectedUploadType?.startsWith("reply")) {
+          const index = parseInt(selectedUploadType.split("-")[1], 10);
+          const updatedReplyData = [...formData.replies];
+          updatedReplyData[index].file = fileURL;
+          handleChange({
+            target: { value: updatedReplyData, name: "replies" },
+          });
+        }
+      }
+
       toast.info("File uploaded successfully", {
         position: "top-right",
         autoClose: 5000,
       });
+
+      handleModalClose();
     } catch (error) {
       toast.error("Error uploading file", {
         position: "top-right",
@@ -294,7 +401,42 @@ export const EPForm = ({ serviceType }) => {
       });
       console.error("Error:", error);
     } finally {
-      setLoading(false);
+      setUploadLoading(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedUploadType(null);
+  };
+
+  const handleSubmitResponse = async () => {
+    try {
+      setLoading(true);
+
+      const data = await postData(
+        "fin_buddy.events.incometax_gov.submit_response",
+        {
+          doctype: FormType,
+          docname: decodedDynamicFormID,
+          client_name: clientId,
+        }
+      );
+
+      setConfirmSubmitModalOpen(true);
+      setTimeout(() => {
+        setConfirmSubmitModalOpen(false);
+      }, 10000);
+    } catch (err) {
+      toast.error("Error in Submitting Response ", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.log("Error", err);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -304,54 +446,65 @@ export const EPForm = ({ serviceType }) => {
 
   const handleOk = () => {
     setIsSubmitModalOpen(false);
+    handleSubmitResponse();
   };
 
   const handleCancel = () => {
     setIsSubmitModalOpen(false);
   };
 
-  const handleAddRow = () => {
+  const handleDocumentsAddRow = () => {
     const newRow = {
-      key: attachedDocuments.length + 1,
-      fileName: "",
-      file: null,
+      key: formData?.other_documents.length + 1,
+      file: "",
     };
-    setAttachedDocuments([...attachedDocuments, newRow]);
-  };
-
-  const handleEditRow = (index, field, value) => {
-    const newData = [...attachedDocuments];
-    newData[index][field] = value;
-    setAttachedDocuments(newData);
+    handleChange({
+      target: {
+        name: "other_documents",
+        value: [...formData?.other_documents, newRow],
+      },
+    });
   };
 
   const attachedDocumentsColumns = [
     {
-      title: "File Name",
-      dataIndex: "file_name",
-      key: "file_name",
-      render: (text, record, index) => (
-        <Input
-          value={text}
-          placeholder="File Name"
-          onChange={(e) => handleEditRow(index, "fileName", e.target.value)}
-        />
-      ),
+      title: "No.",
+      dataIndex: "id",
+      key: "id",
+      render: (text, record, index) => <p>{index + 1}</p>,
     },
     {
       title: "File",
       dataIndex: "file",
       key: "file",
-      render: (text, record, index) => (
-        <Upload
-          beforeUpload={(file) => {
-            handleEditRow(index, "file", file);
-            return false;
-          }}
-        >
-          <Button icon={<UploadOutlined />}>Attach</Button>
-        </Upload>
-      ),
+      render: (text, record, index) =>
+        record.file ? (
+          <div className="flex items-center space-x-2">
+            <a href={record.file} target="_blank" rel="noopener noreferrer">
+              <Button icon={<LinkOutlined />}>View</Button>
+            </a>
+            <Button
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                const updateddocuments = [...formData?.other_documents];
+                updateddocuments[index].file = null;
+                handleChange({
+                  target: { name: "other_documents", value: updateddocuments },
+                });
+              }}
+            />
+          </div>
+        ) : (
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() => {
+              setSelectedUploadType(`otherDocuments-${index}`);
+              setIsModalVisible(true);
+            }}
+          >
+            Attach
+          </Button>
+        ),
     },
   ];
 
@@ -371,6 +524,8 @@ export const EPForm = ({ serviceType }) => {
       }, 2000);
     }
   }, [isFormChanged]);
+
+  console.log("FORM BLUE PRINT", FormBlueprint);
 
   return (
     <>
@@ -402,12 +557,12 @@ export const EPForm = ({ serviceType }) => {
           <Divider style={{ margin: 0, borderWidth: "0.8px" }} />
 
           {/* Group 1 - Client Details */}
-          <div className="mb-6 border-b border-gray-300 pb-6 mt-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Client Details
-            </h3>
 
-            {FormBlueprint != null && FormBlueprint?.section1?.length > 0 && (
+          {FormBlueprint != null && FormBlueprint?.section1?.length > 0 && (
+            <div className="mb-6 border-b border-gray-300 pb-6 mt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Client Details
+              </h3>
               <div className="grid grid-cols-2 gap-4">
                 {FormBlueprint?.section1?.map((item) => (
                   <div>
@@ -425,8 +580,8 @@ export const EPForm = ({ serviceType }) => {
                   </div>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Group 2 - Taxpayer Information */}
 
@@ -493,14 +648,6 @@ export const EPForm = ({ serviceType }) => {
                       <label className="block text-gray-700 font-medium">
                         {item?.label}
                       </label>
-                      <a
-                        href={formData.notice_letter || ""}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-md"
-                      >
-                        View
-                      </a>
                     </div>
                     <input
                       type="text"
@@ -516,23 +663,70 @@ export const EPForm = ({ serviceType }) => {
                 {" "}
                 <div className="flex justify-between items-center">
                   <label className="block text-gray-700 font-medium ">
-                    Upload Document
+                    Notice Letter
                   </label>
-                  {file && (
-                    <p
-                      type="text"
-                      className="text-blue-600 hover:underline text-md cursor-pointer "
-                      onClick={uploadFile}
-                    >
-                      Upload File
-                    </p>
-                  )}
                 </div>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  className=" p-2 border rounded-md cursor-pointer w-full"
-                />
+                {formData?.notice_letter ? (
+                  <div className="flex items-center space-x-2 ">
+                    <a
+                      href={formData?.notice_letter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        icon={<LinkOutlined />}
+                        style={{
+                          padding: "20px",
+                          border: "1px solid #333",
+                          width: "400px",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {" "}
+                        <span
+                          style={{
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                          }}
+                        >
+                          {formData?.notice_letter?.split("/")?.pop()}
+                        </span>
+                      </Button>
+                    </a>
+
+                    <Button
+                      icon={<DeleteOutlined />}
+                      style={{
+                        padding: "20px",
+                        border: "1px solid #333",
+                      }}
+                      onClick={() => {
+                        handleChange({
+                          target: { value: "", name: "notice_letter" },
+                        });
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setSelectedUploadType("notice_letter");
+                      setIsModalVisible(true);
+                    }}
+                    style={{
+                      padding: "20px",
+                      border: "1px solid #333",
+                      width: "450px",
+                    }}
+                    icon={<UploadOutlined />}
+                  >
+                    Attach Notice
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -543,16 +737,25 @@ export const EPForm = ({ serviceType }) => {
                 {FormBlueprint?.section5?.[0]?.sectionHeader}
               </h3>
               <Table
+                pagination={false}
                 columns={decodedKey == "tdsNoticeID" ? tdsColumns : columns}
-                data={
+                dataSource={
                   decodedKey == "tdsNoticeID"
                     ? formData?.notices || []
                     : formData?.replies || []
                 }
-                type={decodedKey == "tdsNoticeID" ? "notices" : "replies"}
-                itemsPerPage={10}
-                isPagination={0}
+                bordered
               />
+
+              {decodedKey !== "tdsNoticeID" && (
+                <Button
+                  onClick={handleAddRow}
+                  icon={<PlusOutlined />}
+                  className="mt-4"
+                >
+                  Add Row
+                </Button>
+              )}
             </div>
           )}
 
@@ -578,12 +781,12 @@ export const EPForm = ({ serviceType }) => {
 
               <Table
                 columns={attachedDocumentsColumns}
-                dataSource={attachedDocuments}
+                dataSource={formData?.other_documents}
                 pagination={false}
                 bordered
               />
               <Button
-                onClick={handleAddRow}
+                onClick={handleDocumentsAddRow}
                 icon={<PlusOutlined />}
                 className="mt-4"
               >
@@ -615,21 +818,56 @@ export const EPForm = ({ serviceType }) => {
               />
             </div>
             <div className="flex flex-wrap gap-4">
-              {fields.map((item, index) => {
-                const value = item.toLowerCase().replace(/\s/g, "_");
-                return (
-                  <Checkbox
-                    key={index}
-                    name="maskData"
-                    value={value}
-                    className="rounded"
-                    checked={maskedFields.includes(value)}
-                    onChange={handleCheckboxChange}
-                  >
-                    {item}
-                  </Checkbox>
-                );
-              })}
+              <Checkbox
+                key={"checks_pan"}
+                name="checks_pan"
+                value={1}
+                className="rounded"
+                checked={formData?.checks_pan}
+                onChange={handleCheckboxChange}
+              >
+                PAN
+              </Checkbox>
+              <Checkbox
+                key={"checks_email"}
+                name="checks_email"
+                value={1}
+                className="rounded"
+                checked={formData?.checks_email}
+                onChange={handleCheckboxChange}
+              >
+                Email
+              </Checkbox>
+              <Checkbox
+                key={"checks_phone_number"}
+                name="checks_phone_number"
+                value={1}
+                className="rounded"
+                checked={formData?.checks_phone_number}
+                onChange={handleCheckboxChange}
+              >
+                Phone Number
+              </Checkbox>
+              <Checkbox
+                key={"checks_aadhar_card"}
+                name="checks_aadhar_card"
+                value={1}
+                className="rounded"
+                checked={formData?.checks_aadhar_card}
+                onChange={handleCheckboxChange}
+              >
+                Aadhar Card
+              </Checkbox>
+              <Checkbox
+                key={"checks_dates"}
+                name="checks_dates"
+                value={1}
+                className="rounded"
+                checked={formData?.checks_dates}
+                onChange={handleCheckboxChange}
+              >
+                Dates
+              </Checkbox>
             </div>
 
             <div className="flex items-center gap-8 ">
@@ -671,6 +909,11 @@ export const EPForm = ({ serviceType }) => {
                 onChange={onSendResponseChange}
               >
                 Send your data to AI Model for response generation?
+                <br />
+                <span className="text-sm">
+                  (Please <strong>View Data</strong> before generating
+                  response.)
+                </span>
               </Checkbox>
             </p>
 
@@ -772,6 +1015,24 @@ export const EPForm = ({ serviceType }) => {
           <p>Are you sure you want to submit response?</p>
         </div>
       </Modal>
+      <Modal
+        title="Message"
+        open={confirmSubmitModalOpen}
+        footer={null}
+        onClose={() => {
+          setConfirmSubmitModalOpen(false);
+        }}
+        centered
+        style={{ top: -50 }}
+      >
+        <div className="flex items-center justify-center flex-col">
+          <img src={SubmitGif} width={250} height={250} />
+          <p className="text-sm text-gray-500 text-center">
+            Please wait, we will take you to the window where you can submit
+            your response.
+          </p>
+        </div>
+      </Modal>
 
       <Modal
         title="Terms and Conditions"
@@ -837,6 +1098,13 @@ export const EPForm = ({ serviceType }) => {
           </Button>
         </div>
       </Modal>
+
+      <FileUploadModal
+        visible={isModalVisible}
+        onClose={handleModalClose}
+        onUpload={handleUpload}
+        disabled={uploadLoading}
+      />
     </>
   );
 };
