@@ -6,11 +6,14 @@ import { useAxiosPost } from "../hooks/useAxios";
 import { ServiceType } from "../utils/enums";
 import AddClientModal from "../components/AddClientModal";
 import { toast } from "react-toastify";
-import { Breadcrumb, Button, Tag } from "antd";
+import { Breadcrumb, Button, Modal, Tag } from "antd";
 import { FaFileImport, FaPlus } from "react-icons/fa";
 import { FaArrowsRotate } from "react-icons/fa6";
 import moment from "moment";
 import { SyncOutlined } from "@ant-design/icons";
+import FetchNoticesImg from "../assets/images/FETCHNOTICES.jpg";
+import UniversalLoader from "../components/UniversalLoader";
+import useScrollToTop from "../hooks/UseScrollToTop";
 
 const urlMapping = {
   fetchClients: {
@@ -23,16 +26,29 @@ const urlMapping = {
     [ServiceType.INCOME_TAX]: "fin_buddy.api.create_income_tax_client",
     [ServiceType.TDS]: "fin_buddy.api.create_tds_client",
   },
+  syncNotices: {
+    [ServiceType.GSTIN]: "fin_buddy.events.gst_gov.process_selected_clients",
+    [ServiceType.INCOME_TAX]:
+      "fin_buddy.events.incometax_gov.process_selected_clients",
+    [ServiceType.TDS]: "fin_buddy.events.tds_gov.process_selected_clients",
+  },
 };
 
 export const Clients = ({ serviceType }) => {
   const navigate = useNavigate();
   const [clientsData, setClientsData] = useState([]);
   const [fetchClientsData] = useAxiosPost(urlMapping.fetchClients[serviceType]);
+  const [syncClientNoticesData] = useAxiosPost(
+    urlMapping.syncNotices[serviceType]
+  );
   const [addNewClient] = useAxiosPost(urlMapping.addClients[serviceType]);
   const [openClientModal, setOpenClientModal] = useState(false);
   const [clientLoading, setClientLoading] = useState(true);
+  const [syncNoticeLoading, setSyncNoticesLoading] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [fetchNoticeModal, setFetchNoticeModal] = useState(false);
 
+  const [selectedClientIds, setSelectedClientIds] = useState([]);
   const GSTColumns = [
     {
       label: "Client Name",
@@ -100,6 +116,23 @@ export const Clients = ({ serviceType }) => {
       },
     },
   ];
+
+  const handleOk = () => {
+    setFetchNoticeModal(false);
+    syncClientNotices([selectedClient?.id]);
+  };
+
+  const handleCancel = () => {
+    setFetchNoticeModal(false);
+    setSelectedClient(null);
+  };
+
+  useEffect(() => {
+    if (selectedClient) {
+      setFetchNoticeModal(true);
+    }
+  }, [selectedClient]);
+
   const columns =
     serviceType == "gstin"
       ? GSTColumns
@@ -163,7 +196,11 @@ export const Clients = ({ serviceType }) => {
             render: (row) => {
               return (
                 <div className="flex items-center justify-center">
-                  <Button onClick={() => {}}>
+                  <Button
+                    onClick={() => {
+                      setSelectedClient(row);
+                    }}
+                  >
                     <FaArrowsRotate />
                   </Button>
                 </div>
@@ -188,6 +225,29 @@ export const Clients = ({ serviceType }) => {
       },
     });
   };
+
+  const syncClientNotices = (data) => {
+    setSyncNoticesLoading(true);
+    syncClientNoticesData({
+      payload: {
+        client_names: data,
+      },
+      cb: (data) => {
+        setTimeout(() => {
+          setSyncNoticesLoading(false);
+          toast.info("Process of fetching notices is started");
+          setSelectedClient(null);
+          setSelectedClientIds([]);
+        }, [1000]);
+      },
+    });
+  };
+
+  useEffect(() => {
+    if (selectedClient == null) {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+  }, [selectedClient]);
 
   const handleAddClient = async (payload) => {
     addNewClient({
@@ -219,6 +279,10 @@ export const Clients = ({ serviceType }) => {
       default:
         return "/404";
     }
+  };
+
+  const handleFetchClientNotice = async () => {
+    syncClientNotices(selectedClientIds);
   };
 
   return (
@@ -268,7 +332,7 @@ export const Clients = ({ serviceType }) => {
       <PageTitle title="All Clients" navigate={() => navigate(-1)} />
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2 mt-4 items-center pl-4 pr-4 justify-between">
+      <div className="flex flex-wrap gap-2 mt-4 items-center pl-4 pr-4 ">
         <div className="flex flex-wrap items-center gap-2">
           <Button
             onClick={() => {
@@ -289,9 +353,17 @@ export const Clients = ({ serviceType }) => {
           <Button type="primary" icon={<FaFileImport />}>
             Import Client
           </Button>
-        </div>
 
-        <div>
+          <Button
+            type="primary"
+            disabled={selectedClientIds.length == 0}
+            icon={<FaArrowsRotate />}
+            onClick={() => {
+              handleFetchClientNotice();
+            }}
+          >
+            Fetch Notices
+          </Button>
           <Button
             type="primary"
             icon={<FaArrowsRotate />}
@@ -319,6 +391,8 @@ export const Clients = ({ serviceType }) => {
         serviceType={serviceType}
         itemsPerPage={10}
         rowRedirection={handleRowRedirection}
+        selectedClientIds={selectedClientIds}
+        setSelectedClientIds={setSelectedClientIds}
       />
 
       <AddClientModal
@@ -340,6 +414,37 @@ export const Clients = ({ serviceType }) => {
             : "GST"
         }
       />
+
+      <Modal
+        title="Confirmation"
+        open={fetchNoticeModal}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        centered
+        style={{ top: -50 }}
+      >
+        <div className="flex items-center justify-center flex-col text-center">
+          <img
+            src={FetchNoticesImg}
+            width={250}
+            height={250}
+            className="rounded-lg"
+          />
+          <p className="text-lg mt-4">
+            Are you sure you want to fetch{" "}
+            <strong>
+              {serviceType == "income-tax"
+                ? "Income Tax"
+                : serviceType == "tds"
+                ? "TDS"
+                : "GST"}{" "}
+            </strong>
+            notices for <strong>{selectedClient?.client_name}</strong> ?
+          </p>
+        </div>
+      </Modal>
+
+      <UniversalLoader show={syncNoticeLoading} text={"Fetching Notices"} />
     </>
   );
 };

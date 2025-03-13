@@ -48,3 +48,11 @@ label {
   color: #4b5563 !important;
   font-size: 1em !important;
 }
+
+.universal-spin .ant-spin-dot-holder {
+  color: #fff !important;
+}
+
+.table-checkbox .ant-checkbox-inner {
+  border: 1.5px solid #2746b2 !important;
+}

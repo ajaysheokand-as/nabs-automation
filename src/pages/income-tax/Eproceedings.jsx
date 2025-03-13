@@ -47,6 +47,8 @@ export const Eproceedings = ({ serviceType }) => {
           <div className="flex items-center h-14 justify-center">
             {row?.proceeding_status == "Active" ? (
               <Tag color="blue">{row?.proceeding_status}</Tag>
+            ) : row?.proceeding_status == "Open" ? (
+              <Tag color="green">{row?.proceeding_status}</Tag>
             ) : (
               <Tag color="red">{row?.proceeding_status}</Tag>
             )}
