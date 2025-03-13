@@ -678,7 +678,7 @@ export const EPForm = ({ serviceType }) => {
                         style={{
                           padding: "20px",
                           border: "1px solid #333",
-                          width: "400px",
+                          width: "100%",
                           overflow: "hidden",
                           whiteSpace: "nowrap",
                           textOverflow: "ellipsis",
@@ -720,7 +720,7 @@ export const EPForm = ({ serviceType }) => {
                     style={{
                       padding: "20px",
                       border: "1px solid #333",
-                      width: "450px",
+                      width: "100%",
                     }}
                     icon={<UploadOutlined />}
                   >

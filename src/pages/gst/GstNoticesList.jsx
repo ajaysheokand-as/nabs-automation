@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 
 import { ServiceType } from "../../utils/enums";
 import { Table } from "../../components/Table";
+import { formatAmount } from "../../utils/helpers";
 
 export const GSTNoticeList = ({ serviceType }) => {
   const { clientId } = useParams();
@@ -16,7 +17,11 @@ export const GSTNoticeList = ({ serviceType }) => {
     { label: "Type", key: "type" },
     { label: "Issue Date", key: "issue_date" },
     { label: "Due Date", key: "due_date" },
-    { label: "Amount", key: "amount" },
+    {
+      label: "Amount",
+      key: "amount",
+      render: (row) => <>{formatAmount(row.amount)}</>,
+    },
     { label: "File", key: "file" },
   ];
 
